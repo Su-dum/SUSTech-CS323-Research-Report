@@ -11,15 +11,14 @@
 
 \ref{sec:intro} 节把问题重述为"适配成本如何组织"。在讨论 MLIR 之前，需要先回答一个更基本的问题：
 在 MLIR 出现之前，业界是如何选"那一层"的？本节考察五个代表性系统，只描述它们把抽象固定在哪里、
-硬件知识从哪个口子进入，不做优劣判断——因为"选哪一层"本身是受使用场景约束的权衡，
-而不是有唯一正确答案的设计题。
+硬件知识从哪个口子进入，不做优劣判断，因为"选哪一层"本身是受使用场景约束的权衡，
+而未必有唯一正确答案。
 
 \subsection{五个系统，五种固定方式}
 
 \paragraph{LLVM IR：把硬件知识整体推迟}
 LLVM 的目标无关 SSA 中间表示在设计上就假定自己不含目标细节~\cite{llvm04}，
-三地址码、标量或向量指令与显式内存语义构成其基本单位。硬件知识并非不存在，而是被
-\textbf{整体推迟}到 IR 之后：指令选择、调度与 MC 层。因此扩展一个新后端，等于实现一套
+三地址码、标量或向量指令与显式内存语义构成其基本单位。硬件知识被\textbf{整体推迟}到 IR 之后：指令选择、调度与 MC 层。因此扩展一个新后端，等于实现一套
 \texttt{TargetLowering} 与指令选择模式；扩展一个新前端，则需要把源语言的全部语义下降成 LLVM IR。
 
 \paragraph{Halide：把调度从算法里拆出来}
@@ -30,21 +29,21 @@ RISC-V，以及 CUDA、OpenCL、OpenGL Compute、Metal、DirectX~12。这实际�
 
 \paragraph{TVM：固定两层}
 TVM 同时暴露图级与算子级优化~\cite{tvm18}：图级负责算子融合等粗粒度变换，算子级负责
-"映射到任意硬件原语"，并把内存延迟隐藏交给调度。硬件知识主要进入\textbf{算子级}——通过
+"映射到任意硬件原语"，并把内存延迟隐藏交给调度。硬件知识主要进入\textbf{算子级}，通过
 tensor intrinsic、内存布局与 target 相关的下放规则。固定两层的好处是图级优化不必关心目标，
 代价是接入新硬件往往要同时适配两层。
 
 \paragraph{XLA：固定一层，其余交给后端}
 XLA 的流程是三段式~\cite{xlaarch}：先在 StableHLO 上做\textbf{目标无关}的优化并转成内部
 HLO；再交给后端做\textbf{目标相关}的 HLO 级优化；最后生成 LLVM IR 交给 LLVM 完成代码生成。
-值得单独指出的是，布局（layout）在 HLO 内部就以显式 pass 的形式被指派~\cite{xlathunks}——
+值得单独指出的是，布局（layout）在 HLO 内部就以显式 pass 的形式被指派~\cite{xlathunks}，
 XLA 把"数据在内存里怎么摆"这件与硬件强相关的事，放在了与 IR 同一层处理。新增后端的路径是
 "实现 \texttt{xla::Compiler} 接口"~\cite{xlabackend}。
 
 XLA 官方文档自己给出了这个设计的动机，原话是：\emph{retargeting XLA should be significantly
 simpler and more scalable than implementing every existing op from a frontend framework such as
 PyTorch or TensorFlow for new hardware}~\cite{xlabackend}。这句话很重要：它说明"避免逐对适配"
-不是本文事后附会的叙事，而是项目自己写下的设计目标。于是本文的问题不是新造的——同一问题上，
+该表述出自项目自身的设计文档。同一问题上，
 XLA 与 MLIR 给了两种不同的答案。
 
 \paragraph{Triton：固定 tile 级，并且本身就是 MLIR 的一组方言}
@@ -52,7 +51,7 @@ Triton 面向分块（tiled）的神经网络计算~\cite{triton19}，把抽象�
 grid 模型。它常被误解为"绕开通用编译栈"的例子，但其编译器\textbf{本身就构建在 MLIR 上}：
 其 IR 是一组方言，\texttt{tt}（Triton IR）$\rightarrow$ \texttt{ttg}（TritonGPU，含布局）
 $\rightarrow$ \texttt{ttng}/\texttt{nvg}（NVIDIA）或 \texttt{amdg}（AMD）~\cite{tritondialects}。
-换句话说，Triton 是 MLIR 的一种\textbf{纵向用法}——只保留必要的一两级方言，把 tile 级钉死，
+Triton 属于 MLIR 的一种\textbf{纵向用法}：只保留必要的一两级方言，把 tile 级钉死，
 再一路下到厂商方言；它与 IREE、StableHLO 这类"宽栈"用法共同构成 MLIR 生态的两种形态。
 
 \begin{table}[t]
@@ -86,13 +85,13 @@ $\rightarrow$ \texttt{ttng}/\texttt{nvg}（NVIDIA）或 \texttt{amdg}（AMD）~\
 
 \subsection{三点评注}
 
-\paragraph{一：层的位置是守恒的，不是可以省掉的}
-表中六行没有一行是"无层"的——每行都选了至少一层，TVM 选了两层。能变的只是"选在哪"。
-因此严格的说法不是"有了 MLIR 就不必选层"，而是：\textbf{抽象层的位置可以随域调整，
+\paragraph{一：层的位置是守恒的}
+表中六行都选了至少一层，TVM 选了两层。能变的只是"选在哪"。
+因此更准确的说法是：\textbf{抽象层的位置可以随域调整，
 但抽象层的总量不会消失}。MLIR 改变的是"谁来做这个选择、以及能否在同一程序里保留多个选择"，
 而不是"可以不做选择"。
 
-\paragraph{二：固定点越低，前端越厚、后端越薄——这是一条权衡曲线}
+\paragraph{二：固定点越低，前端越厚、后端越薄}
 LLVM IR 固定在最低处：前端必须承担全部语义下降，后端只需做指令选择；XLA 固定在高处：
 前端只需产出 StableHLO（极薄），后端必须承担全部目标相关重写（极厚）。Halide、TVM、Triton
 落在曲线的不同高度上。
@@ -107,9 +106,9 @@ LLVM IR 固定在最低处：前端必须承担全部语义下降，后端只需
 以换取 HLO 这一层的稳定；MLIR 把它放到 dialect 边界上，允许边界本身被重新协商。
 
 这一区别不需要评判谁更好，但它解释了第~\ref{sec:evidence} 节的实证结果：如果 MLIR 的成功
-取决于"边界能否被协商成功"，那么\textbf{边界协商的成本}就是关键变量——这正是第~\ref{sec:contract} 节
+取决于"边界能否被协商成功"，那么\textbf{边界协商的成本}就是关键变量，第~\ref{sec:contract} 节
 要考察的内容。
 
 \paragraph{关于表~\ref{tab:layer-fixing} 的 MLIR 一行}
-该行是\textbf{机制描述}（依据 MLIR 的设计文献与官方文档），不是本文的实测结果；
+该行属\textbf{机制描述}（依据 MLIR 的设计文献与官方文档），并非本文的实测结果；
 它与第~\ref{sec:evidence} 节基于语料统计的证据强度不同，不应等同看待。

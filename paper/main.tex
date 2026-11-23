@@ -73,33 +73,43 @@
 
 \title{MLIR 的多级抽象设计及其在 AI 编译器生态中的角色：\\从成对适配到分层共享的复用成本分析}
 
-%% ---- 作者信息（按需填写学号） ----
-\author{Su-dum}
+%% ---- 作者信息 ----
+%% 三人合作，署名按提供顺序；不区分组长与组员。学号未排入正文（ACM 版式不印学号），
+%% 如需随报告提交，请另附提交表单。
+\author{蒋言}
 \affiliation{%
   \institution{Southern University of Science and Technology}
   \department{Department of Computer Science and Engineering}
   \city{Shenzhen}
   \country{China}}
-\email{12410337@mail.sustech.edu.cn}
 
-\author{（组员姓名，待填）}
+\author{黄俊智}
 \affiliation{%
   \institution{Southern University of Science and Technology}
+  \department{Department of Computer Science and Engineering}
   \city{Shenzhen}
   \country{China}}
 
-\renewcommand{\shortauthors}{Su-dum et al.}
+\author{黄文治}
+\affiliation{%
+  \institution{Southern University of Science and Technology}
+  \department{Department of Computer Science and Engineering}
+  \city{Shenzhen}
+  \country{China}}
+
+\renewcommand{\shortauthors}{}
 
 %% ============================================================
 \begin{abstract}
-%% TODO(§ 摘要)：定稿时写成三句——问题与通行叙事（N×M）、本文做法（重构命题 + 语料实证 + 成本模型）、
-%% 结论的限定形式（"在……条件下成立"）。以下是占位草稿，不要原样提交。
-一个编译器要同时面对 $N$ 个前端框架与 $M$ 种硬件，逐对适配的成本是乘法的。
-本文把"MLIR 解决了 $N\times M$ 组合爆炸"这一通行叙事，重构为一个可检验的命题：
-MLIR 把适配成本从 $N\cdot M$ 重写为 $|E|+N+M$，但收益取决于共享层是否被多方采纳。
-基于 \texttt{llvm-project} 的 3,329 个 MLIR 测试文件（181,326 个算子），
-本文测得 $|E|=76$ 条方言间转换、$371$ 个转换文件中有 $298$ 个进入层间矩阵，并发现收敛发生在少数端点上而非层级上。
-成本模型显示，工程层面的门槛约在 9 到 26 个前端之间（随采纳率），而架构层面的门槛只有约 5 个。
+深度学习编译器需同时支持多个前端框架与多种加速器，逐对适配的工作量随两端数量之积增长。
+已有系统各自把某一抽象层固定为稳定接口，代价是语义下降集中于前端或后端一侧。
+MLIR 改为提供可扩展的方言体系与渐进的下降机制，使抽象层级的数量与位置由使用方定义；
+但适配成本能否随之下降，取决于生态如何组织这些层级。
+本文在 \texttt{llvm-project} 的 3,329 个 MLIR 测试文件（181,326 个算子）上测得 76 条方言间转换，
+观察到转换强度收敛于少数端点（104 个文件、来自 19 个方言，均汇入 \texttt{llvm}），
+而非集中于某一抽象层级。
+将适配成本写为 $N\cdot M$ 与 $|E|+N+M$ 两种组织方式后，层边界与方言对两种计数口径给出的规模阈值
+分别约为 5 与 16 个前端，且后者对采纳率与后端数均高度敏感。
 \end{abstract}
 
 %% ---- CCS Concepts：若需完整版，请从 dl.acm.org 的 CCS 工具生成 CCSXML 后粘贴 ----
@@ -125,6 +135,12 @@ MLIR 把适配成本从 $N\cdot M$ 重写为 $|E|+N+M$，但收益取决于共�
 
 \maketitle
 
+%% 关掉 acmart 的页眉：其偶数页右上角会印 \shortauthors，奇数页左侧印短标题，
+%% 伴以 "卷:页" 的期刊式页码。课程报告不需要这些，改为 plain（仅页底居中页码）。
+%% 若希望恢复期刊式页眉，删掉下面两行即可。
+%%\thispagestyle{plain}
+%%\pagestyle{plain}
+
 %% ============================================================
 \input{sections/01-intro}
 \input{sections/02-background}
@@ -134,9 +150,13 @@ MLIR 把适配成本从 $N\cdot M$ 重写为 $|E|+N+M$，但收益取决于共�
 \input{sections/06-limitations}
 \input{sections/07-conclusion}
 
-%% ---- 可选：AI 使用披露（课程已取消强制要求；保留与否自定） ----
-%% \section*{Use of AI Tools}
-%% ...
+%% ---- 数据与工具说明 ----
+%% 这一段承担两件事：交代数据来源（可复现性），以及工具使用情况（如实、简短、不展开细节）。
+%% 若课程确实不要求任何声明，可整段删除——但不要改成"未使用 AI"这类与实际不符的说法。
+\section*{数据与工具说明}
+本文结论基于公开语料 \texttt{llvm-project} 快照 \texttt{ba736172} 的 \texttt{mlir/test} 目录，
+采集与分析脚本连同原始输出一并提交。代码实现、文献核对与文字整理过程中使用了 AI 辅助工具；
+研究问题、论文收集、数据分析与结论由作者负责。
 
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}

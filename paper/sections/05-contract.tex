@@ -21,8 +21,8 @@ TensorFlow 与 XLA 的端到端流程"~\cite{mlirhlorepo}，同时也是"把技�
 
 StableHLO 的官方自述是"基于 MHLO，并\textbf{增加了序列化与版本化}"，并以此提供双向兼容保证~\cite{stablehlorepo,stablehlospec}。
 把这句话展开，增量几乎与算子语义无关，全在制度层面（表~\ref{tab:contract}）。
-到 v1.0 发布时，98 个算子被完整写进规格并配上 verifier 与类型推断~\cite{stablehlov1}——
-也就是说，契约的技术前提是\textbf{先把语义钉死}，否则"兼容"无从判定。
+到 v1.0 发布时，98 个算子被完整写进规格并配上 verifier 与类型推断~\cite{stablehlov1}，
+契约的技术前提因此是\textbf{先把语义钉死}，否则"兼容"无从判定。
 
 \begin{table}[t]
   \caption{StableHLO 相对 MHLO 增加的契约设施。新增项均为"制度性"机制，
@@ -48,13 +48,13 @@ StableHLO 的官方自述是"基于 MHLO，并\textbf{增加了序列化与版�
 其中三项值得单独点出。第一，\textbf{版本不可回填}：一个版本被 supersede 之后不能再往里加内容，
 任何变更都必须开新 minor 版本，于是旧版本的语义被真正冻结，而不是"大致不变"。
 第二，\textbf{把版本化实现成一个方言}（VHLO）：序列化时先把 StableHLO 降到目标版本的 VHLO，
-读回时再升上来——旧程序的兼容不再依赖"尽力而为"，而有明确的目标表示。
+读回时再升上来，旧程序的兼容不再依赖"尽力而为"，而有明确的目标表示。
 第三，\textbf{兼容窗口有年限且可测}：5 年向后、2 年向前~\cite{stablehlorfccompat,stablehlorfcv1compat}，并且写成每个 PR 都要通过的
 双向兼容测试~\cite{stablehlocompat,stablehlorfcfwd}，目标版本取"至少 4 周或 12 周前被 supersede 的版本"。
 
 \subsection{三点推论}
 
-\paragraph{推论一：契约的成本是治理成本，不是实现成本}
+\paragraph{推论一：契约的成本属于治理成本}
 表~\ref{tab:contract} 里没有一项是"再实现一个算子"。成本集中在别处：多轮兼容性 RFC 的讨论、
 每周一次的发布节奏、一个专门用于版本化的方言、以及逐 PR 的双向兼容测试套。
 这些开销与"这一层有多少算子"关系不大，而与"\textbf{有多少方在依赖它}"关系很大。
@@ -62,18 +62,18 @@ StableHLO 的官方自述是"基于 MHLO，并\textbf{增加了序列化与版�
 \paragraph{推论二：这套治理能力不在 MLIR 里}
 StableHLO 的兼容性文档在"Future work"一节写明：他们计划\textbf{把兼容性测试套贡献回 MLIR 上游}~\cite{stablehlocompat}，
 以便在 MLIR 的 bytecode 基础设施里更早发现意外破坏（该 issue 目前仍为 open）。
-换句话说，\textbf{在贡献之前，这套契约是 StableHLO 自己立法、自己执行、自己承担}的。
+\textbf{在贡献之前，这套契约由 StableHLO 自己立法、自己执行、自己承担}。
 
 这一条直接支撑第~\ref{sec:evidence} 节的结论：MLIR 提供的是\textbf{机制}（dialect、bytecode、
 interface、渐进下降），而"某一层被多方采纳"需要\textbf{采用者自己建立制度}。
-于是采纳率 $p$ 不是给定的，而是被治理出来的——这就是"收益条件性"的机制解释。
+于是采纳率 $p$ 由治理过程决定，这构成"收益条件性"的机制解释。
 它也说明第~\ref{sec:evidence} 节的社区摊销不是自动发生的：摊销的前提，是有人先把契约立起来。
 
 \paragraph{推论三：契约必须显式排除一些东西才能成立}
 StableHLO 的兼容性文档专设"out of scope"一节：只对以特定方式生成的 portable artifact 保证兼容，
 prettyprinted IR 与裸 bytecode 不保证；未规格化的特性不保证；当实现与规范冲突时允许破坏兼容。
-这说明一个可辩护的契约不是"什么都保证"，而是"\textbf{明确保证这些、明确不保证那些}"。
-这一点接得上第~\ref{sec:mechanisms} 节的机制四——边界可声明，但\textbf{不等于边界免费}：
+可辩护的契约因\textbf{明确保证这些、明确不保证那些}而成立。
+这一点接得上第~\ref{sec:mechanisms} 节的机制四：边界可声明，但\textbf{不等于边界免费}，
 声明边界本身要成本，而且必须写清反面。
 
 \subsection{小结}

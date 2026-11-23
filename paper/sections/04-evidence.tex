@@ -29,10 +29,10 @@
 \texttt{transform}/\texttt{irdl}/\texttt{smt}/\texttt{dlti}/\texttt{pdl} 单列为"基础设施方言"。
 划分是主观的，因此第~\ref{sec:robust} 小节做替代划分检验。
 
-\textbf{必须说明的偏差。}本节统计的是\textbf{测试文件数量}，它是"工程投入分布"的代理指标，
+\textbf{已知偏差。}本节统计的是\textbf{测试文件数量}，它是"工程投入分布"的代理指标，
 不是性能、也不是使用率。这一点在第~\ref{sec:limitations} 节展开。
 
-\subsection{发现一：收敛发生在端点，而不是层}
+\subsection{发现一：收敛发生在端点}
 
 落到最深层（硬件目标层）的转换文件占全部层间转换的 \textbf{79.2\%}（236/298）。
 但真正的汇聚点是少数\textbf{具体方言}，而非"目标层"这个类别：\texttt{llvm} 的入度为
@@ -41,14 +41,13 @@
 
 更值得看的是 \texttt{llvm} 的来源分布：104 个文件来自 \textbf{19 个不同方言}，
 其中最大来源是 \texttt{spirv}（25）、\texttt{func}（13）、\texttt{memref}（10）、
-\texttt{acc}（10）、\texttt{vector}（10）。也就是说，共享不是层与层之间的对称交换，
-而是\textbf{所有源都指向少数终端}的星形结构。
+\texttt{acc}（10）、\texttt{vector}（10）。共享因而呈现为\textbf{所有源指向少数终端}的星形结构，而非层间的对称交换。
 
 原因不难理解：\texttt{llvm} 方言之下直接就是 LLVM 后端，它是所有目标里唯一"已被全行业接受"
 的接口；SPIR-V 在 GPU 侧扮演类似角色。
 
-需要强调这一发现\textbf{不能}说明什么：它不代表其他层没有价值。\texttt{linalg}、\texttt{scf}、
-\texttt{memref} 是\textbf{变换发生}的场所，只是不是\textbf{汇聚}的场所——两者是不同的问题。
+这一发现\textbf{不能}说明其他层没有价值。\texttt{linalg}、\texttt{scf}、
+\texttt{memref} 是\textbf{变换发生}的场所，但并不\textbf{汇聚}流量，两者是不同的问题。
 
 \begin{figure}[t]
   \centering
@@ -67,7 +66,7 @@
 \begin{itemize}
   \item \textbf{厂商内二级栈}：\texttt{amdgpu}$\rightarrow$\texttt{rocdl}（42）、
         \texttt{xegpu}$\rightarrow$\texttt{xevm}（20）、\texttt{nvgpu}$\rightarrow$\texttt{nvvm}（6），
-        合计 \textbf{68 个文件 / 3 条边}。每个厂商在 MLIR 里不是一层，而是两级：面向编程模型的
+        合计 \textbf{68 个文件 / 3 条边}。每个厂商在 MLIR 里占据两级：面向编程模型的
         一级加面向指令的一级。
   \item \textbf{出口转向}：\texttt{spirv}$\rightarrow$\texttt{llvm}（25）、
         \texttt{acc}$\rightarrow$\texttt{llvm}（10）、\texttt{xevm}$\rightarrow$\texttt{llvm}（6）、
@@ -77,13 +76,13 @@
 
 这里必须做一次\textbf{归因上的自我约束}。一个自然的推断是"因为厂商在目标层内部展开了子栈，
 所以方言对比层对数多了一个量级"；但数据不支持这个因果：厂商二级栈只贡献 \textbf{3 条边}。
-真正的原因是\textbf{层边界内部本身就含多个方言对}——例如"并行与控制 $\rightarrow$ 硬件目标"
+真正的原因是\textbf{层边界内部本身就含多个方言对}。例如"并行与控制 $\rightarrow$ 硬件目标"
 这一条层边界里就有 \texttt{gpu}$\rightarrow$\texttt{spirv}、\texttt{gpu}$\rightarrow$\texttt{rocdl}、
 \texttt{gpu}$\rightarrow$\texttt{nvvm}、\texttt{scf}$\rightarrow$\texttt{spirv}、
 \texttt{omp}$\rightarrow$\texttt{llvm} 等。平均而言，一条层边界约含 5 个方言对。
 
 因此正确的表述是：厂商二级栈是 $|E|$ 的\textbf{一部分}来源，但"层对数 $\ll$ 方言对数"的主因
-是\textbf{方言对粒度本身}。这个修正让发现二从因果论断退回结构性描述，但反而更结实：
+是\textbf{方言对粒度本身}。这个修正让发现二从因果论断退回结构性描述，结论反而更稳：
 它解释了 $|E|$ 为什么天然比层数大一个量级。
 
 \subsection{发现三：投入是两级结构，而非均匀分布}
@@ -97,13 +96,12 @@
   \item 另有跨层通用方言 73（5.3\%）与基础设施方言 80（5.8\%）单列。
 \end{itemize}
 
-导入层的投入只有中后段的约 \textbf{1/4 到 1/6}。原因不是上游不重视框架接入，而是承接框架的活
-在\textbf{别的仓库}：\texttt{torch-mlir} 接 PyTorch，\texttt{StableHLO} 接 JAX/TF，
+导入层的投入只有中后段的约 \textbf{1/4 到 1/6}。承接框架的工作在\textbf{别的仓库}：\texttt{torch-mlir} 接 PyTorch，\texttt{StableHLO} 接 JAX/TF，
 \texttt{ONNX-MLIR} 接 ONNX。本语料中 \texttt{frontend} 层作为转换源的方言\textbf{只有
-\texttt{tosa} 一个}，\texttt{torch}/\texttt{stablehlo}/\texttt{mhlo} 一个都没有出现——生态侧的
+\texttt{tosa} 一个}，\texttt{torch}/\texttt{stablehlo}/\texttt{mhlo} 一个都没有出现。生态侧的
 框架名单可参见 MLIR 的公开用户列表~\cite{mlirusers}。
 
-这正是"栈顶碎片化"的量化形态：\textbf{共享与复用集中在中后段，栈顶由各生态自己承担}。
+这是"栈顶碎片化"的量化形态：\textbf{共享与复用集中在中后段，栈顶由各生态自己承担}。
 
 附带一个观察：基础设施方言（\texttt{transform} 45、\texttt{irdl} 16 等）合计 80 个文件（5.8\%），
 它们描述\textbf{编译过程本身}而不是被编译程序的抽象层。把它们从"层"里分离出去，本身说明
@@ -150,7 +148,7 @@ $|E|$ 有两种数法，结果差一个量级：
 \end{itemize}
 
 在 $N=8$、$M=11$ 的现实规模下：架构级口径下成对适配 88、分层共享 69.2（分层占优）；
-工程级口径下成对 88、分层 130.2（\textbf{分层反而更贵}）。
+工程级口径下成对 88、分层 130.2（\textbf{分层更贵}）。
 
 差别不在 $p$，而在于\textbf{你把什么算作"一次实现"}。真实工程明显偏向工程级：
 \texttt{AMDGPUToROCDL} 与 \texttt{NVGPUToNVVM} 不可能因为"同在一层"就被同一段代码实现。
@@ -158,32 +156,42 @@ $|E|$ 有两种数法，结果差一个量级：
 因此命题必须写成带条件的形式：MLIR 把成本从 $N\cdot M$ 重写为 $|E|+N+M$；以层边界计数时门槛
 极低，以方言对计数时门槛升至十几到二十几个前端；两者之差，就是"分层"这一抽象在工程实现中
 漏掉的成本。门槛对采纳率高度敏感：$p$ 从 1.0 降到 0.4，$N^{*}$ 从 8.7 升到 25.6（约 2.9 倍）。
-该结论对应图~\ref{fig:cost}。
+图~\ref{fig:cost} 给出模型的形状。
 
-\subsection{发现五：|E| 的社区摊销——一个补充解释}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig3_cost_model.png}
+  \caption{成本随规模的变化。实线为成对适配 $N\cdot M$；虚线为分层共享
+  $|E|+N+M+(1-p)\cdot N\cdot M$（$|E|=76$，$M=11$，$p=0.6$）。
+  竖虚线为交叉点 $N^{*}\approx 15.5$。右图为 $(M,N)$ 平面上的成本比。}
+  \Description{左图为三条成本曲线与交叉点，右图为成本比热力图}
+  \label{fig:cost}
+\end{figure}
+
+\subsection{发现五：|E| 的社区摊销}
 
 上文把 $|E|$ 当作\textbf{单个组织}要支付的成本。但在 MLIR 生态中，$|E|$ 是上游与社区
 \textbf{实现一次、所有采用者共享}的：
 
 \begin{itemize}
   \item 单组织视角：$C_{\text{layer}} = |E| + N + M$，于是 $N$ 不够大时分层更贵
-        （这正是工程级门槛 $\approx 15.5$ 的由来）；
+        （工程级门槛 $\approx 15.5$ 由此而来）；
   \item 生态视角：$|E|$ 由社区一次性支付，每个采用者只付\textbf{边际成本} $N+M$。
 \end{itemize}
 
 这解开了一个表面上的张力：本文模型说"N 较小时分层更贵"，而 MLIR 确实被广泛采纳。
-两者并不矛盾——采纳者摊销的正是 $|E|$。它也解释了为什么共享层一旦形成就极难被替代
+两者并不矛盾：采纳者摊销的正是 $|E|$。它也解释了为什么共享层一旦形成就极难被替代
 （沉没成本由生态承担），以及为什么"另起一层"比"加入一层"贵得多。
 
-需要明确标注：这一小节是\textbf{对模型的补充解释，不是本文的测量结果}。
+这一小节是\textbf{对模型的补充解释}，不是本文的测量结果。
 
 \subsection{发现六：两条跨层通用语}
 
 方言共现矩阵显示，\texttt{func} 与 \texttt{arith} 的共现文件数达 1,454，且各自与
 \texttt{memref}、\texttt{vector}、\texttt{linalg}、\texttt{scf}、\texttt{tensor} 的共现都在
-数百量级——这印证了把它们单列为"跨层通用"的处理。另一个有用的旁证是：\texttt{transform}
+数百量级，印证了把它们单列为"跨层通用"的处理。另一个有用的旁证是：\texttt{transform}
 与 \texttt{linalg}（154）、\texttt{tensor}（99）的共现显著高于其他，与 \texttt{llvm} 只有 4，
-说明调度 DSL \textbf{依附于}结构化计算层，而不是独立一层——这与第~\ref{sec:mechanisms} 节
+说明调度 DSL \textbf{依附于}结构化计算层，而非独立一层，这与第~\ref{sec:mechanisms} 节
 机制三的论证一致。此外 \texttt{llvm} 与 \texttt{omp} 共现 234，来自
 \texttt{OpenMPToLLVM} 这条路径。
 
@@ -206,8 +214,8 @@ $|E|$ 有两种数法，结果差一个量级：
 按来源\textbf{层}看，结构更清楚：来自最深层自身 114（39.9\%）、并行与控制层 60（21.0\%）、
 跨层通用方言 50（17.5\%）、存储与向量层 46（16.1\%）、导入层 10（3.5\%）、张量层 6（2.1\%）。
 
-这给出第二层结构：\textbf{星形收敛的上游也是少数瓶颈点}。它同时印证了发现二——
-汇入最深层的流量中有近四成来自最深层自身，这正是"厂商二级栈 + 出口转向"的形状。
+这给出第二层结构：\textbf{星形收敛的上游也是少数瓶颈点}。它同时印证了发现二：
+汇入最深层的流量中有近四成来自最深层自身，与"厂商二级栈 + 出口转向"的结构一致。
 实践含义也很直接：若要改善通往硬件目标的路径，只需照顾少数几个中间方言
 （\texttt{gpu}、\texttt{vector}、\texttt{memref}、\texttt{spirv}），而不必覆盖全部 25 个来源。
 
@@ -227,12 +235,12 @@ $N^{*}$ & 31.5 & 22.1 & 17.2 & 15.5 & 11.4 & 8.7 \\
 \end{center}
 
 $N^{*}$ 在 $M$ 从 6 增到 20 时由 31.5 降到 8.7，摆动约 \textbf{3.6 倍}，比 $p$ 造成的
-2.9 倍更大。结论因此要写得更谨慎：门槛不是单一数字，而是 $(M, p)$ 平面上的一个区域；
+2.9 倍更大。结论因此要写得更谨慎：门槛是 $(M, p)$ 平面上的一个区域，不存在单一数值；
 本文取 $M=11$（数据实测）与 $p=0.6$（敏感性基线）只是给出一个参照点。
 
-这里还有一处口径需要交代：$M=11$ 把\textbf{通用出口}（\texttt{llvm}、\texttt{spirv}）与
+此外，$M=11$ 把\textbf{通用出口}（\texttt{llvm}、\texttt{spirv}）与
 \textbf{厂商指令方言}（\texttt{rocdl}、\texttt{nvvm} 等）混在同一层里计数，
-而发现二恰恰指出这两类在结构上不同。若按稳健性检验的六层划分只数厂商方言，$M$ 会更小、
+而发现二已指出这两类在结构上不同。若按稳健性检验的六层划分只数厂商方言，$M$ 会更小、
 门槛会更高。因此上表的敏感性区间应当被理解为\textbf{口径不确定性的下界}。
 
 \subsection{稳健性检验：换一套层划分}

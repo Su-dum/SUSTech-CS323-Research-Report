@@ -16,7 +16,7 @@
 | ACM 模板 | ✅ `acmsmall` 单栏 + `nonacm`，XeLaTeX 编译通过 |
 | 参考文献 | ✅ 24 条全部编号正确并被引用；`[? ]` 与 `[n. d.]` 均为 0 |
 | 编译体检 | ✅ Errors 0 / Overfull 0 / 未定义引用 0 |
-| 时间序列分析 | ⬜  [docs/09](docs/09-timeseries-task.md) |
+| 时间序列分析 | ⬜ |
 
 **距离 18 页上限还有 4 页余量**，见「后续工作」中可加固的方向。
 
@@ -53,7 +53,6 @@ tools/              采集、分析、出图、体检脚本（零第三方依赖
 |---|---|
 | [paper/main.tex](paper/main.tex) | 论文主文件；作者、摘要、页眉、参考书目都在这里 |
 | [paper/README.md](paper/README.md) | 模板选择理由、编译方式、常见报错 |
-| [docs/09-timeseries-task.md](docs/09-timeseries-task.md) |多版本时间序列分析 |
 | [docs/08-section6-limitations.md](docs/08-section6-limitations.md) | §6 素材：机制代价、七条局限、结论强度分级 |
 | [docs/07-section5-stablehlo.md](docs/07-section5-stablehlo.md) | §5 素材：mhlo→StableHLO 的治理与兼容机制 |
 | [docs/06-section3-figure.md](docs/06-section3-figure.md) | §3 素材：图 2 的论点与四个机制的硬主张 |

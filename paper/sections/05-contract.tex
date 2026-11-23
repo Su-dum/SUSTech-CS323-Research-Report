@@ -1,25 +1,29 @@
 %% ============================================================
 %%  §5 共享契约的谈判成本：mhlo -> StableHLO
-%%  要证明的一句话：
-%%    把一个方言变成各方都敢依赖的契约，需要版本化、序列化与兼容测试等制度性设施；
-%%    这部分成本不体现在 |E| 里，却决定共享层采纳率 p 能否上去。
-%%  素材：docs/07-section5-stablehlo.md
-%%  建议篇幅：1.5 页
 %% ============================================================
 
 \section{共享契约的谈判成本}
 \label{sec:contract}
 
-%% 开篇：§3 说明了 MLIR 有能力让层被协商，但没说明"协商成功"需要什么。
-%% 本节用一个真实的迁移案例回答。
+第~\ref{sec:mechanisms} 节说明了 MLIR 有能力让层被重新划定，但没有回答一个问题：
+\textbf{把某一层真正变成各方都敢依赖的接口，需要付出什么？} 本节用一个真实迁移案例回答：
+MLIR 生态中 \texttt{mhlo} 到 \texttt{StableHLO} 的更替。
 
-%% ---- MHLO 的位置问题 ----
-%% 它长期作为独立孵化仓库存在于 tensorflow/mlir-hlo，定位是"独立于 TF 与 XLA 的端到端流程"、
-%% "把技术上游化的孵化器"。把它当框架与编译器之间的接口，等于把跨组织接口放在一个项目的内部 IR 上。
-%% 现状：官方已标 deprecated，建议迁移（措辞是 deprecated + 迁移建议，不是"设计不好"）。
+\subsection{把接口放在一个项目的内部 IR 上}
 
-%% ---- StableHLO 的增量：全是契约设施，不是算子语义 ----
-%% 官方自述："基于 MHLO，并增加了序列化与版本化"，以此提供前后向兼容保证。
+\texttt{MHLO} 长期作为独立孵化仓库存在于 \texttt{tensorflow/mlir-hlo}，其定位是"独立于
+TensorFlow 与 XLA 的端到端流程"~\cite{mlirhlorepo}，同时也是"把技术上游化的孵化器"。
+用它充当"框架与编译器之间的接口"，等于把\textbf{跨组织的接口}放在一个项目的\textbf{内部 IR} 上：
+没有版本承诺、没有序列化契约，语义随实现漂移。官方现已将其标记为 deprecated，
+建议"所有对 MHLO 的依赖都应通过 XLA，使用者应尽可能迁移到 StableHLO"~\cite{mlirhlorepo}。
+
+\subsection{StableHLO 增加的几乎全是契约设施}
+
+StableHLO 的官方自述是"基于 MHLO，并\textbf{增加了序列化与版本化}"，并以此提供双向兼容保证~\cite{stablehlorepo,stablehlospec}。
+把这句话展开，增量几乎与算子语义无关，全在制度层面（表~\ref{tab:contract}）。
+到 v1.0 发布时，98 个算子被完整写进规格并配上 verifier 与类型推断~\cite{stablehlov1}——
+也就是说，契约的技术前提是\textbf{先把语义钉死}，否则"兼容"无从判定。
+
 \begin{table}[t]
   \caption{StableHLO 相对 MHLO 增加的契约设施。新增项均为"制度性"机制，
   而非算子语义改造。}
@@ -41,15 +45,40 @@
   \end{tabularx}
 \end{table}
 
-%% ---- 三条推论 ----
-%% A. 契约的成本是治理成本：上表没有一行是"再实现一个算子"；成本在 RFC、每周发版、
-%%    一个 VHLO 方言、逐 PR 的兼容测试套。
-%% B. 这套治理能力不在 MLIR 里：compatibility.md 的 Future work 明确说要"把兼容性测试套
-%%    贡献回 MLIR 上游"（issue #1632）。在贡献之前，契约是 StableHLO 自己立法、自己执行、自己承担。
-%%    => 这正是 §4 结论"收益条件性"的机制解释：MLIR 提供机制，契约由采用者建立。
-%% C. 契约必须显式排除才能成立：out-of-scope 三条说明"边界可声明，但不等于边界免费"，
-%%    接得上 §3 的机制 ④。
+其中三项值得单独点出。第一，\textbf{版本不可回填}：一个版本被 supersede 之后不能再往里加内容，
+任何变更都必须开新 minor 版本，于是旧版本的语义被真正冻结，而不是"大致不变"。
+第二，\textbf{把版本化实现成一个方言}（VHLO）：序列化时先把 StableHLO 降到目标版本的 VHLO，
+读回时再升上来——旧程序的兼容不再依赖"尽力而为"，而有明确的目标表示。
+第三，\textbf{兼容窗口有年限且可测}：5 年向后、2 年向前~\cite{stablehlorfccompat,stablehlorfcv1compat}，并且写成每个 PR 都要通过的
+双向兼容测试~\cite{stablehlocompat,stablehlorfcfwd}，目标版本取"至少 4 周或 12 周前被 supersede 的版本"。
 
-%% 收束句（建议原话）：
-%% 由此可见，MLIR 让层可被协商，但把某一层变成各方都敢依赖的契约，需要采用者自建版本、
-%% 序列化与兼容测试制度；这部分成本不体现在转换数量 |E| 里，却决定了 p 能否真正上去。
+\subsection{三点推论}
+
+\paragraph{推论一：契约的成本是治理成本，不是实现成本}
+表~\ref{tab:contract} 里没有一项是"再实现一个算子"。成本集中在别处：多轮兼容性 RFC 的讨论、
+每周一次的发布节奏、一个专门用于版本化的方言、以及逐 PR 的双向兼容测试套。
+这些开销与"这一层有多少算子"关系不大，而与"\textbf{有多少方在依赖它}"关系很大。
+
+\paragraph{推论二：这套治理能力不在 MLIR 里}
+StableHLO 的兼容性文档在"Future work"一节写明：他们计划\textbf{把兼容性测试套贡献回 MLIR 上游}~\cite{stablehlocompat}，
+以便在 MLIR 的 bytecode 基础设施里更早发现意外破坏（该 issue 目前仍为 open）。
+换句话说，\textbf{在贡献之前，这套契约是 StableHLO 自己立法、自己执行、自己承担}的。
+
+这一条直接支撑第~\ref{sec:evidence} 节的结论：MLIR 提供的是\textbf{机制}（dialect、bytecode、
+interface、渐进下降），而"某一层被多方采纳"需要\textbf{采用者自己建立制度}。
+于是采纳率 $p$ 不是给定的，而是被治理出来的——这就是"收益条件性"的机制解释。
+它也说明第~\ref{sec:evidence} 节的社区摊销不是自动发生的：摊销的前提，是有人先把契约立起来。
+
+\paragraph{推论三：契约必须显式排除一些东西才能成立}
+StableHLO 的兼容性文档专设"out of scope"一节：只对以特定方式生成的 portable artifact 保证兼容，
+prettyprinted IR 与裸 bytecode 不保证；未规格化的特性不保证；当实现与规范冲突时允许破坏兼容。
+这说明一个可辩护的契约不是"什么都保证"，而是"\textbf{明确保证这些、明确不保证那些}"。
+这一点接得上第~\ref{sec:mechanisms} 节的机制四——边界可声明，但\textbf{不等于边界免费}：
+声明边界本身要成本，而且必须写清反面。
+
+\subsection{小结}
+
+由此可见，MLIR 让层可被协商，但把某一层变成各方都敢依赖的契约，需要采用者自建版本、序列化与
+兼容测试制度。这部分成本\textbf{不体现在转换数量 $|E|$ 里}，却决定了采纳率 $p$ 能否真正上去。
+换一种说法：第~\ref{sec:evidence} 节把 $|E|$ 的摊销当作"生态视角"的补充解释，
+而本节说明，\textbf{摊销之所以可能，是因为有人先付了治理成本}。

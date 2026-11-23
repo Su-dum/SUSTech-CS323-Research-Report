@@ -41,6 +41,16 @@ from pathlib import Path
 
 LAYER_COLORS = ["#4E79A7", "#59A14F", "#F28E2B", "#B07AA1", "#E15759", "#76B7B2"]
 
+# 论文模式：图内标题与副标题由 LaTeX caption 承担，避免重复。设成 >0 即裁掉顶部该高度。
+DROP_TOP = 0
+
+
+def set_drop_top(v: int):
+    """设置顶部裁剪高度（像素）。0 表示保留图内标题。"""
+    global DROP_TOP
+    DROP_TOP = int(v)
+
+
 
 # ---------------------------------------------------------------- SVG / PNG 双后端
 
@@ -78,6 +88,23 @@ class SVG:
     # -- 导出 SVG
 
     def save(self, path: Path):
+        if DROP_TOP:
+            # 丢掉顶部的标题/副标题文字，并把整体上移、缩短画布
+            self.ops = [op for op in self.ops
+                        if not (op[0] == "text" and op[1]["y"] < DROP_TOP)]
+            for kind, a in self.ops:
+                if kind == "rect":
+                    a["y"] -= DROP_TOP
+                elif kind == "line":
+                    a["y1"] -= DROP_TOP; a["y2"] -= DROP_TOP
+                elif kind == "bez":
+                    for k in ("y1", "c1y", "c2y", "y2"):
+                        a[k] -= DROP_TOP
+                elif kind == "poly":
+                    a["pts"] = [(x, y - DROP_TOP) for x, y in a["pts"]]
+                elif kind == "text":
+                    a["y"] -= DROP_TOP
+            self.h -= DROP_TOP
         out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" '
                f'viewBox="0 0 {self.w} {self.h}" font-family="{self.font_family}">',
                f'<rect width="{self.w}" height="{self.h}" fill="{self.bg}"/>']
@@ -629,8 +656,13 @@ def main(argv=None) -> int:
                     help="M：后端数量。省略时自动采用实测值（target 层内作为转换目标的方言数）")
     ap.add_argument("--adoption", type=float, default=0.6, help="p：共享层采纳率 0~1（请自行估计并说明方法）")
     ap.add_argument("--topk", type=int, default=12, help="共现矩阵取前 k 个方言")
+    ap.add_argument("--no-title", action="store_true",
+                    help="裁掉图内标题与副标题（论文用，标题交给 LaTeX caption）")
     ap.add_argument("--preview-png", action="store_true", help="额外输出 PNG 预览（需 Pillow）")
     args = ap.parse_args(argv)
+
+    if args.no_title:
+        set_drop_top(70)
 
     outdir = Path(args.outdir)
     cfg_path = Path(args.config) if args.config else (Path(__file__).resolve().parent / "layers.json")

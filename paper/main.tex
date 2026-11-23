@@ -10,7 +10,7 @@
 %% 价格行与虚构 DOI（否则会出现 "2026. 0164-0925/... $15.00" 与 doi.org/10.1145/nnnn...）。
 %% 注意 acmart 的 toppmatter 只有 printccs / printacmref / printfolios 三个键，
 %% 没有 printcopyright，所以不能靠 \settopmatter 关版权块。
-\documentclass[acmsmall, screen=true, review=false, nonacm=true]{acmart}
+\documentclass[acmsmall, screen=true, nonacm=true]{acmart}
 
 %% ---- 期刊信息 ----
 %% acmart 的 \acmJournal 是 xkeyval 的 choice key：只接受其内部注册的代码。
@@ -38,7 +38,7 @@
 \ifXeTeX
   \usepackage{xeCJK}
   \setCJKmainfont[ItalicFont=FandolKai-Regular.otf,BoldFont=FandolHei-Regular.otf]{FandolSong-Regular.otf}
-  \setCJKsansfont{FandolHei-Regular.otf}
+  \setCJKsansfont[AutoFakeBold=2]{FandolHei-Regular.otf}
   \setCJKmonofont{FandolFang-Regular.otf}
 \fi
 \ifLuaTeX
@@ -64,6 +64,10 @@
 %% 官方做法是 \setcopyright{none}（copyright mode = none 会同时关掉 copyright 与 permission）。
 \settopmatter{printacmref=false}
 \pagestyle{plain}
+
+%% 中文断行没有连字符可拆，遇到 \texttt{...} 这类不可断的长串容易溢出；
+%% 放宽一排版的伸缩余量，消掉 Overfull \hbox。
+\setlength{\emergencystretch}{2em}
 
 \begin{document}
 

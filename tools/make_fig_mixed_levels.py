@@ -30,7 +30,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from analyze import LAYER_COLORS, SVG  # noqa: E402
+from analyze import LAYER_COLORS, SVG, set_drop_top  # noqa: E402
 
 # ---------------------------------------------------------------- 选材配置
 
@@ -193,8 +193,12 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mlir-root", required=True)
     ap.add_argument("--out", default="out/fig_mixed_levels.svg")
+    ap.add_argument("--no-title", action="store_true")
     ap.add_argument("--preview-png", action="store_true")
     args = ap.parse_args(argv)
+
+    if args.no_title:
+        set_drop_top(70)
 
     src = Path(args.mlir_root) / SOURCE
     if not src.is_file():

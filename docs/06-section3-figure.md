@@ -1,7 +1,7 @@
 # §3 素材：图 2 与四个机制
 
 > 图已生成：[out/fig_mixed_levels.svg](../out/fig_mixed_levels.svg)（PNG 仅预览）。
-> 生成脚本：[tools/make_fig2_mixed_levels.py](../tools/make_fig2_mixed_levels.py)，
+> 生成脚本：[tools/make_fig_mixed_levels.py](../tools/make_fig_mixed_levels.py)，
 > 选材脚本：[tools/find_multilevel_snippets.py](../tools/find_multilevel_snippets.py)。
 
 ---
@@ -71,7 +71,7 @@
 
 ```powershell
 python tools\find_multilevel_snippets.py --mlir-root D:\llvm-project\mlir --min-layers 3 --list 20
-python tools\make_fig2_mixed_levels.py --mlir-root D:\llvm-project\mlir --preview-png
+python tools\make_fig_mixed_levels.py --mlir-root D:\llvm-project\mlir --preview-png
 ```
 
 选材脚本会在 3,329 个文件里按"层数 + 规模 + 纯净度 + 是否跨越 bufferization 边界"打分，

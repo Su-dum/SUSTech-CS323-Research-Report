@@ -48,8 +48,10 @@ LAYER_COLORS = ["#4E79A7", "#59A14F", "#F28E2B", "#B07AA1", "#E15759", "#76B7B2"
 class SVG:
     """记录绘图原语，可导出为 SVG（交付用）或 PNG（预览用）。"""
 
-    def __init__(self, w: int, h: int, bg: str = "#ffffff"):
+    def __init__(self, w: int, h: int, bg: str = "#ffffff",
+                 font_family: str = "Helvetica,Arial,sans-serif"):
         self.w, self.h, self.bg = w, h, bg
+        self.font_family = font_family
         self.ops: list[tuple[str, dict]] = []
 
     def rect(self, x, y, w, h, fill, stroke="none", sw=1, rx=0, opacity=1.0):
@@ -68,15 +70,16 @@ class SVG:
         self.ops.append(("poly", dict(pts=list(pts), stroke=stroke, sw=sw, dash=dash)))
 
     def text(self, x, y, s, size=11, anchor="start", color="#222", weight="normal",
-             rotate=None, opacity=1.0):
+             rotate=None, opacity=1.0, family=None):
         self.ops.append(("text", dict(x=x, y=y, s=str(s), size=size, anchor=anchor,
-                                      color=color, weight=weight, rotate=rotate, op=opacity)))
+                                      color=color, weight=weight, rotate=rotate, op=opacity,
+                                      family=family)))
 
     # -- 导出 SVG
 
     def save(self, path: Path):
         out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" '
-               f'viewBox="0 0 {self.w} {self.h}" font-family="Helvetica,Arial,sans-serif">',
+               f'viewBox="0 0 {self.w} {self.h}" font-family="{self.font_family}">',
                f'<rect width="{self.w}" height="{self.h}" fill="{self.bg}"/>']
         for kind, a in self.ops:
             if kind == "rect":
@@ -107,7 +110,9 @@ class SVG:
                 out.append(
                     f'<text x="{a["x"]:.1f}" y="{a["y"]:.1f}" font-size="{a["size"]}" '
                     f'text-anchor="{a["anchor"]}" fill="{a["color"]}" '
-                    f'font-weight="{a["weight"]}" opacity="{a["op"]}"{tr}>{escape(a["s"])}</text>')
+                    f'font-weight="{a["weight"]}" opacity="{a["op"]}"'
+                    + (f' font-family="{a["family"]}"' if a.get("family") else "")
+                    + f'{tr}>{escape(a["s"])}</text>')
         out.append("</svg>")
         path.write_text("\n".join(out) + "\n", encoding="utf-8")
         print(f"     图：{path}")
@@ -122,17 +127,29 @@ class SVG:
             return
         import os
 
-        font_paths = [r"C:\Windows\Fonts\msyh.ttc", r"C:\Windows\Fonts\simhei.ttf",
-                      "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"]
+        if "mono" in self.font_family.lower() or "consol" in self.font_family.lower():
+            font_paths = [r"C:\Windows\Fonts\consola.ttf", r"C:\Windows\Fonts\cour.ttf",
+                          "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"]
+        else:
+            font_paths = [r"C:\Windows\Fonts\msyh.ttc", r"C:\Windows\Fonts\simhei.ttf",
+                          "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"]
         fpath = next((p for p in font_paths if os.path.exists(p)), None)
+        cjk_paths = [r"C:\Windows\Fonts\msyh.ttc", r"C:\Windows\Fonts\simhei.ttf"]
+        cjk_path = next((p for p in cjk_paths if os.path.exists(p)), fpath)
 
-        def font(sz):
-            if fpath:
+        def _load(path, sz):
+            if path:
                 try:
-                    return ImageFont.truetype(fpath, int(sz))
+                    return ImageFont.truetype(path, int(sz))
                 except OSError:
                     pass
             return ImageFont.load_default()
+
+        def font(sz, family=None):
+            # 逐条：等宽文字用等宽字体，其余走 CJK 字体
+            if family and ("mono" in family.lower() or "consol" in family.lower()):
+                return _load(fpath, sz)
+            return _load(cjk_path, sz)
 
         img = Image.new("RGBA", (self.w, self.h), self.bg)
         for kind, a in self.ops:
@@ -171,7 +188,7 @@ class SVG:
                 d.line([tuple(p) for p in a["pts"]], fill=col(a["stroke"]),
                        width=max(1, int(a["sw"])), joint="curve")
             elif kind == "text":
-                f = font(a["size"])
+                f = font(a["size"], a.get("family"))
                 s = a["s"]
                 try:
                     tw = d.textlength(s, font=f)

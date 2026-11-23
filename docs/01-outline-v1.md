@@ -23,7 +23,7 @@
 | Abstract + CCS + Keywords | — | 0.4 | — |
 | §1 引言 | 问题重述 + 命题 + 贡献 | 1.5 | **图 1 = 成本模型图**（`out/fig3_cost_model.svg`） |
 | §2 只选一层的代价：从 LLVM IR 到 TVM/XLA | 历史与维度对比 | 2.0 | **表 1 = 维度对比表** |
-| §3 MLIR 的机制：层级如何变成一等对象 | dialect / interface / 渐进下降 | 3.5 | **图 2 = 混层 IR 片段**（手工绘制） |
+| §3 MLIR 的机制：层级如何变成一等对象 | dialect / interface / 渐进下降 | 3.5 | **图 2 = 多级共存片段**（out/fig_mixed_levels.svg，见 [06](06-section3-figure.md)） |
 | §4 生态结构实证 | 五条发现 + 稳健性 | 3.5 | **图 3 = 层间转换图**（`out/fig1_layer_transitions.svg`）<br>**图 4 = 共现矩阵**（`out/fig2_dialect_cooccurrence.svg`）<br>**表 2 = 投入分布**（`out/fig4_layer_investment.svg` 或表格） |
 | §5 共享契约的谈判成本：mhlo→StableHLO | 案例 | 1.5 | — |
 | §6 代价、局限与威胁效度 | 反面与自我批评 | 1.5 | — |

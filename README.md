@@ -13,13 +13,15 @@
 | 四张图 | ✅ `out/fig1..fig4.svg`（PNG 为预览） |
 | 结果解读 | ✅ [docs/04-results-v1.md](docs/04-results-v1.md)，含稳健性检验 |
 | §2 对比表 | ✅ [docs/05-section2-comparison.md](docs/05-section2-comparison.md)，已核到一手文献 |
-| 正文写作 | 🟡 §2 可落笔；§4 可落笔；§1/§3/§5/§6 待写 |
+| §3 图 2 | ✅ [out/fig_mixed_levels.svg](out/fig_mixed_levels.svg) + [docs/06](docs/06-section3-figure.md) |
+| 正文写作 | 🟡 §2、§4 可落笔；§3 有图与机制清单；§1/§5/§6 待写 |
 | ACM 模板 | ⬜ 待建 |
 
 ## 文件导航
 
 | 文件 | 用途 |
 |---|---|
+| [docs/06-section3-figure.md](docs/06-section3-figure.md) | **§3 素材**：图 2 的论点、图注、LaTeX 引入、选材理由，以及另外三个机制的硬主张 |
 | [docs/05-section2-comparison.md](docs/05-section2-comparison.md) | **§2 素材**：LLVM / Halide / TVM / XLA / Triton / MLIR 的维度对比表（含 LaTeX 版）、逐格证据、三条分析、核对过的 BibTeX |
 | [docs/04-results-v1.md](docs/04-results-v1.md) | **实证结果与解读**：五条发现、对命题的修正、稳健性检验、局限。写 §4 从这里拿料 |
 | [out/facts.md](out/facts.md) | 同一批数字的机器生成版（无解释），可核对 |
@@ -39,7 +41,7 @@
 | 报告中的编号 | 文件 | 承载的论点 |
 |---|---|---|
 | 图 1 | `out/fig3_cost_model.svg` | §1 立问题：成本交叉点 N\*，两种组织方式的规模阈值 |
-| 图 2 | 手工绘制（建议） | §3 混层 IR 片段：linalg + scf + arith + memref 在同一函数体内 |
+| 图 2 | out/fig_mixed_levels.svg | §3 多级共存：同一 module 内整算子与显式循环并存 |
 | 图 3 | `out/fig1_layer_transitions.svg` | §4 层间转换结构：汇入最深层的那束粗线 |
 | 图 4 | `out/fig2_dialect_cooccurrence.svg` | §4 共现结构：`func`/`arith` 作为跨层通用语 |
 | 表 1 | 手工整理 | §2 维度对比（LLVM / Halide / TVM / XLA / Triton） |

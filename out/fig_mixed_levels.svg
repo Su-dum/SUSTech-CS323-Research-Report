@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="662" viewBox="0 0 950 662" font-family="Helvetica,Arial,sans-serif">
+<rect width="950" height="662" fill="#ffffff"/>
+<text x="24.0" y="30.0" font-size="15" text-anchor="start" fill="#222" font-weight="bold" opacity="1.0">图 2  同一 module 内的多级抽象共存</text>
+<text x="24.0" y="50.0" font-size="10.5" text-anchor="start" fill="#666" font-weight="normal" opacity="1.0">选自 test/Integration/Dialect/Linalg/CPU/matmul-vs-matvec.mlir（节选 29 行，未改写）；左侧色条标出该行算子所属的抽象层</text>
+<text x="24.0" y="66.0" font-size="10.5" text-anchor="start" fill="#666" font-weight="normal" opacity="1.0">同一份模块里，同一个矩阵乘既以整体结构化算子存在，也以显式循环加子算子存在——所以下降可以是部分的</text>
+<text x="36.0" y="88.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">8</text>
+<rect x="26.0" y="80.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="88.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">func.func @matmul(%A: memref&lt;?x?xf32&gt;, %B: memref&lt;?x?xf32&gt;) -&gt; (memref&lt;?x?xf32&gt;) {</text>
+<text x="36.0" y="103.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">9</text>
+<rect x="26.0" y="95.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="103.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %c0 = arith.constant 0 : index</text>
+<text x="36.0" y="118.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">10</text>
+<rect x="26.0" y="110.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="118.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %c1 = arith.constant 1 : index</text>
+<text x="36.0" y="133.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">11</text>
+<rect x="26.0" y="125.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="133.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %f0 = arith.constant 0.0 : f32</text>
+<text x="36.0" y="148.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">12</text>
+<rect x="26.0" y="140.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="148.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %x = memref.dim %A, %c0 : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="163.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">13</text>
+<rect x="26.0" y="155.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="163.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %y = memref.dim %B, %c1 : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="178.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">14</text>
+<rect x="26.0" y="170.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="178.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %C = memref.alloc(%x, %y) : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="193.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">15</text>
+<rect x="26.0" y="185.0" width="4.0" height="10.0" rx="1" fill="#59A14F" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="193.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  linalg.fill ins(%f0 : f32) outs(%C : memref&lt;?x?xf32&gt;)</text>
+<text x="36.0" y="208.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">16</text>
+<rect x="26.0" y="200.0" width="4.0" height="10.0" rx="1" fill="#59A14F" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="208.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  linalg.matmul ins(%A, %B: memref&lt;?x?xf32&gt;, memref&lt;?x?xf32&gt;)</text>
+<text x="36.0" y="223.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">17</text>
+<rect x="26.0" y="215.0" width="4.0" height="10.0" rx="1" fill="#59A14F" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="223.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">                outs(%C: memref&lt;?x?xf32&gt;)</text>
+<text x="36.0" y="238.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">18</text>
+<rect x="26.0" y="230.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="238.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  return %C : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="253.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">19</text>
+<rect x="26.0" y="245.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="253.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">}</text>
+<text x="56.0" y="266.0" font-size="9.5" text-anchor="start" fill="#98A2B3" font-weight="normal" opacity="1.0">…（省略 module 内其他函数的声明与调用）…</text>
+<text x="36.0" y="279.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">21</text>
+<rect x="26.0" y="271.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="279.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">func.func @matvec(%A: memref&lt;?x?xf32&gt;, %B: memref&lt;?x?xf32&gt;) -&gt; (memref&lt;?x?xf32&gt;) {</text>
+<text x="36.0" y="294.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">22</text>
+<rect x="26.0" y="286.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="294.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %c0 = arith.constant 0 : index</text>
+<text x="36.0" y="309.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">23</text>
+<rect x="26.0" y="301.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="309.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %c1 = arith.constant 1 : index</text>
+<text x="36.0" y="324.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">24</text>
+<rect x="26.0" y="316.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="324.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %f0 = arith.constant 0.0 : f32</text>
+<text x="36.0" y="339.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">25</text>
+<rect x="26.0" y="331.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="339.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %m = memref.dim %A, %c0 : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="354.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">26</text>
+<rect x="26.0" y="346.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="354.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %x = memref.dim %A, %c1 : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="369.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">27</text>
+<rect x="26.0" y="361.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="369.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %n = memref.dim %B, %c1 : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="384.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">28</text>
+<rect x="26.0" y="376.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="384.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  %C = memref.alloc(%m, %n) : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="399.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">29</text>
+<rect x="26.0" y="391.0" width="4.0" height="10.0" rx="1" fill="#59A14F" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="399.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  linalg.fill ins(%f0 : f32) outs(%C : memref&lt;?x?xf32&gt;)</text>
+<text x="36.0" y="414.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">30</text>
+<rect x="26.0" y="406.0" width="4.0" height="10.0" rx="1" fill="#F28E2B" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="414.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  scf.for %i = %c0 to %n step %c1 {</text>
+<text x="36.0" y="429.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">31</text>
+<rect x="26.0" y="421.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="429.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">    %b = memref.subview %B[0, %i][%x, 1][1, 1] : memref&lt;?x?xf32&gt; to memref&lt;?xf32, strided&lt;[?], offset: ?&gt;&gt;</text>
+<text x="36.0" y="444.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">32</text>
+<rect x="26.0" y="436.0" width="4.0" height="10.0" rx="1" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="444.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">    %c = memref.subview %C[0, %i][%m, 1][1, 1] : memref&lt;?x?xf32&gt; to memref&lt;?xf32, strided&lt;[?], offset: ?&gt;&gt;</text>
+<text x="36.0" y="459.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">33</text>
+<rect x="26.0" y="451.0" width="4.0" height="10.0" rx="1" fill="#59A14F" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="459.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">    linalg.matvec ins(%A, %b: memref&lt;?x?xf32&gt;, memref&lt;?xf32, strided&lt;[?], offset: ?&gt;&gt;)</text>
+<text x="36.0" y="474.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">34</text>
+<rect x="26.0" y="466.0" width="4.0" height="10.0" rx="1" fill="#59A14F" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="474.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">                  outs(%c: memref&lt;?xf32, strided&lt;[?], offset: ?&gt;&gt;)</text>
+<text x="36.0" y="489.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">35</text>
+<rect x="26.0" y="481.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="489.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  }</text>
+<text x="36.0" y="504.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">36</text>
+<rect x="26.0" y="496.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="504.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">  return %C : memref&lt;?x?xf32&gt;</text>
+<text x="36.0" y="519.4" font-size="8.5" text-anchor="end" fill="#A6AEBB" font-weight="normal" opacity="1.0">37</text>
+<rect x="26.0" y="511.0" width="4.0" height="10.0" rx="1" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="52.0" y="519.6" font-size="10.0" text-anchor="start" fill="#1F2430" font-weight="normal" opacity="1.0" font-family="Consolas, 'DejaVu Sans Mono', 'Courier New', monospace">}</text>
+<line x1="782.0" y1="81.0" x2="782.0" y2="255.0" stroke="#C9D0D9" stroke-width="1.5" opacity="1.0"/>
+<line x1="777.0" y1="81.0" x2="782.0" y2="81.0" stroke="#C9D0D9" stroke-width="1.5" opacity="1.0"/>
+<line x1="777.0" y1="255.0" x2="782.0" y2="255.0" stroke="#C9D0D9" stroke-width="1.5" opacity="1.0"/>
+<text x="791.0" y="91.0" font-size="9" text-anchor="start" fill="#5a6472" font-weight="bold" opacity="1.0">整算子</text>
+<text x="791.0" y="104.0" font-size="9" text-anchor="start" fill="#5a6472" font-weight="normal" opacity="1.0">一次 linalg.matmul</text>
+<line x1="782.0" y1="272.0" x2="782.0" y2="521.0" stroke="#C9D0D9" stroke-width="1.5" opacity="1.0"/>
+<line x1="777.0" y1="272.0" x2="782.0" y2="272.0" stroke="#C9D0D9" stroke-width="1.5" opacity="1.0"/>
+<line x1="777.0" y1="521.0" x2="782.0" y2="521.0" stroke="#C9D0D9" stroke-width="1.5" opacity="1.0"/>
+<text x="791.0" y="282.0" font-size="9" text-anchor="start" fill="#5a6472" font-weight="bold" opacity="1.0">显式循环</text>
+<text x="791.0" y="295.0" font-size="9" text-anchor="start" fill="#5a6472" font-weight="normal" opacity="1.0">scf.for + 子算子</text>
+<text x="24.0" y="546.0" font-size="10.5" text-anchor="start" fill="#444" font-weight="bold" opacity="1.0">层级图例</text>
+<rect x="26.0" y="555.0" width="10.0" height="10.0" rx="2" fill="#59A14F" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="44.0" y="563.0" font-size="9.5" text-anchor="start" fill="#333" font-weight="normal" opacity="1.0">张量代数层（结构化算子：linalg.matmul / matvec / fill）</text>
+<rect x="26.0" y="571.0" width="10.0" height="10.0" rx="2" fill="#F28E2B" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="44.0" y="579.0" font-size="9.5" text-anchor="start" fill="#333" font-weight="normal" opacity="1.0">并行与控制层（显式循环：scf.for）</text>
+<rect x="26.0" y="587.0" width="10.0" height="10.0" rx="2" fill="#B07AA1" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="44.0" y="595.0" font-size="9.5" text-anchor="start" fill="#333" font-weight="normal" opacity="1.0">存储与向量层（缓冲区与显式搬运：memref.*）</text>
+<rect x="26.0" y="603.0" width="10.0" height="10.0" rx="2" fill="#C2C8D2" stroke="none" stroke-width="1" opacity="1.0"/>
+<text x="44.0" y="611.0" font-size="9.5" text-anchor="start" fill="#333" font-weight="normal" opacity="1.0">跨层通用（arith / func / return / 右括号）</text>
+<text x="24.0" y="648.0" font-size="9" text-anchor="start" fill="#8a94a6" font-weight="normal" opacity="1.0">说明：真实语料，未改写；仅按行区间节选，省略处以 … 标出。色条由行首算子命名空间决定，} 与 return 归入跨层通用。</text>
+</svg>

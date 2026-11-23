@@ -9,18 +9,22 @@
 |---|---|
 | 选题与命题 | ✅ 定稿为「成本重分配 + 条件性收益」 |
 | 语料获取 | ✅ `llvm-project` @ `ba736172`，稀疏克隆只取 `mlir/` |
-| 数据采集与分析 | ✅ 3,329 个测试文件 / 181,326 个算子 / 79 条方言转换边 |
+| 数据采集与分析 | ✅ 3,329 个测试文件 / 181,326 个算子 / 78 条方言转换边 |
 | 四张图 | ✅ `out/fig1..fig4.svg`（PNG 为预览） |
 | 结果解读 | ✅ [docs/04-results-v1.md](docs/04-results-v1.md)，含稳健性检验 |
 | §2 对比表 | ✅ [docs/05-section2-comparison.md](docs/05-section2-comparison.md)，已核到一手文献 |
 | §3 图 2 | ✅ [out/fig_mixed_levels.svg](out/fig_mixed_levels.svg) + [docs/06](docs/06-section3-figure.md) |
-| 正文写作 | 🟡 §2、§4 可落笔；§3 有图与机制清单；§1/§5/§6 待写 |
+| §5 案例 | ✅ [docs/07](docs/07-section5-stablehlo.md)，已核到官方文档与 RFC |
+| §6 局限 | ✅ [docs/08](docs/08-section6-limitations.md)，含结论强度分级 |
+| 正文写作 | 🟡 §2–§6 均可落笔；§1 待定 N 的计数口径 |
 | ACM 模板 | ⬜ 待建 |
 
 ## 文件导航
 
 | 文件 | 用途 |
 |---|---|
+| [docs/08-section6-limitations.md](docs/08-section6-limitations.md) | **§6 素材**：机制代价、七条实证局限（逐条绑定结论）、结论强度分级、数字自检清单 |
+| [docs/07-section5-stablehlo.md](docs/07-section5-stablehlo.md) | **§5 素材**：mhlo→StableHLO 的治理与兼容机制（时间线、机制表、三条推论、已核对的 BibTeX） |
 | [docs/06-section3-figure.md](docs/06-section3-figure.md) | **§3 素材**：图 2 的论点、图注、LaTeX 引入、选材理由，以及另外三个机制的硬主张 |
 | [docs/05-section2-comparison.md](docs/05-section2-comparison.md) | **§2 素材**：LLVM / Halide / TVM / XLA / Triton / MLIR 的维度对比表（含 LaTeX 版）、逐格证据、三条分析、核对过的 BibTeX |
 | [docs/04-results-v1.md](docs/04-results-v1.md) | **实证结果与解读**：五条发现、对命题的修正、稳健性检验、局限。写 §4 从这里拿料 |
@@ -64,7 +68,7 @@ python tools\analyze.py --corpus out\corpus.csv --outdir out --n-frameworks 8 --
 python tools\analyze.py --corpus out\corpus.csv --outdir out_alt --config tools\layers_alt.json --n-frameworks 8 --n-backends 8 --adoption 0.6
 ```
 
-参数说明：`M=8` 由数据实测（`target` 层内作为转换目标的方言数）；`N=8` 是生态假设，需在正文说明来源；`p=0.6` 是敏感性分析的基线，不是估计值。
+参数说明：`M=10` 由数据实测（`target` 层内作为转换目标的方言数：llvm/spirv/rocdl/xevm/nvvm/amdgpu/xegpu/arm_sme/nvgpu/vcix）；`N=8` 是生态假设，需在正文说明来源；`p=0.6` 是敏感性分析的基线，不是估计值。
 
 ## 三条写作纪律
 

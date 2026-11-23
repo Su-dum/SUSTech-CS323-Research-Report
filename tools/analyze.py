@@ -490,7 +490,8 @@ def write_facts(path: Path, ctx: dict):
         dst[d] += c
         src[s] += c
     for d, c in ctx["unattributed"].items():
-        dst[d] += c
+        if not d.startswith("src:"):
+            dst[d] += c
     dst.pop("*", None)
     deepest = {L["id"] for L in order if L["order"] == max(x["order"] for x in order)}
     into_target = sum(c for (s, d), c in le.items() if d in deepest)
@@ -565,7 +566,7 @@ def write_facts(path: Path, ctx: dict):
         A(f"| {k.split('=')[1]} | {v if v is not None else '无解（p·M ≤ 1）'} |")
     A("")
     A("分别用两种 |E| 代入（M 不变）：\n")
-    A("| \\|E\\| 口径 | \\|E\\| | p=0.6 时的 N\\* | N=8, M=6 时 C_pair vs C_layer |")
+    A(f"| \\|E\\| 口径 | \\|E\\| | p=0.6 时的 N\\* | N={ctx['N']}, M={ctx['M']} 时 C_pair vs C_layer |")
     A("|---|---|---|---|")
     for name, E in (("工程级（方言对）", len(ef)),
                     ("架构级（层对）", sum(1 for v in le.values() if v))):
@@ -578,13 +579,14 @@ def write_facts(path: Path, ctx: dict):
     A("")
 
     if ctx["unattributed"]:
-        A("## 6. 未计入层间矩阵的转换目录（源方言不定）\n")
-        A("| 目标端点 | 文件数 |")
+        A("## 6. 未计入层间矩阵的转换目录（一端方言不定）\n")
+        A("| 已知端点 | 文件数 |")
         A("|---|---|")
         for k, v in ctx["unattributed"].most_common():
             A(f"| `{k}` | {v} |")
         A("")
-        A("这些目录（如 `ConvertToSPIRV`）不指明源方言，因此只计入目标端点证据，不计入层间边。\n")
+        A("`src:` 前缀表示**目标**方言不定（raising 类，如 `RaiseWasm`）；其余表示**源**方言不定（泛化目录，如 `ConvertToSPIRV`）。")
+        A("两类都只按已知的一端计入端点证据，不计入层间边。\n")
 
     A("## 7. 待解释（写在 docs/04 或正文）\n")
     A("- 第 2 节的收敛点为什么是 `llvm`，而不是「某一层」？")
@@ -630,17 +632,25 @@ def main(argv=None) -> int:
                     cooc[(b, a)] += 1
 
     edge_files, layer_edges = Counter(), Counter()
-    unattributed = Counter()          # src='*'：源方言不定的泛化转换目录，只按目标端点记
+    unattributed = Counter()          # 一端为 * 的转换（源或目标不定），只按已知端点记
+    unresolved = Counter()            # 两端都不定
     for r in rows:
         if r["area_kind"] != "Conversion":
             continue
         s, d = r["src_ns"], r["dst_ns"]
-        if not d:
+        if not d and not s:
+            unresolved[r["area_name"]] += 1
+            continue
+        if s == "*" and d == "*":
+            unresolved[r["area_name"]] += 1
             continue
         if s == "*":
             unattributed[d] += 1
             continue
-        if not s:
+        if d == "*":
+            unattributed["src:" + s] += 1
+            continue
+        if not s or not d:
             continue
         edge_files[(s, d)] += 1
         ls, ld = ns2layer.get(s), ns2layer.get(d)

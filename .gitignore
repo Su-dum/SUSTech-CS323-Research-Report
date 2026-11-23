@@ -63,25 +63,34 @@ tmp/
 scratch/
 
 # ============================================================
-# 以后加入论文 LaTeX 源码时，取消下面注释
+# 论文 LaTeX（paper/ 已启用）
 # ============================================================
-# # LaTeX 中间产物
-# *.aux
-# *.log
-# *.out
-# *.toc
-# *.lof
-# *.lot
-# *.fls
-# *.fdb_latexmk
-# *.synctex.gz
-# *.synctex(busy)
-# *.bbl
-# *.blg
-# *.run.xml
-# # acmart 的参考文献由 .bib 生成，不提交 .bbl
-# # 编译出的 PDF：若要做 release，则提交；否则忽略
-# paper/*.pdf
+# LaTeX 中间产物
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.lof
+paper/*.lot
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.synctex.gz
+paper/*.synctex(busy)
+paper/*.blg
+paper/*.bbl
+paper/*.run.xml
+paper/*.nav
+paper/*.snm
+paper/*.vrb
+paper/sections/*.aux
+paper/sections/*.log
+# acmart 的参考文献由 references.bib 生成，不提交 .bbl
+# 编译出的 PDF：若要做 release，取消下一行注释
+paper/main.pdf
+
+# 本地 TeX 构建目录
+paper/build/
+paper/.latexmk/
 
 # ============================================================
 # ⚠️ 不提交：课程/教师提供的材料（版权与合规）

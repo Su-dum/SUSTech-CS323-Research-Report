@@ -3,7 +3,7 @@
     "n_files": 3329
   },
   "structure": {
-    "n_distinct_dialect_pairs": 79,
+    "n_distinct_dialect_pairs": 78,
     "layer_matrix": {
       "frontend->frontend": 0,
       "frontend->tensor": 9,
@@ -48,11 +48,6 @@
       {
         "src": "amdgpu",
         "dst": "rocdl",
-        "files": 42
-      },
-      {
-        "src": "wasmssa",
-        "dst": "*",
         "files": 42
       },
       {
@@ -119,6 +114,11 @@
         "src": "scf",
         "dst": "spirv",
         "files": 8
+      },
+      {
+        "src": "memref",
+        "dst": "emitc",
+        "files": 7
       }
     ],
     "deepest_layers": [
@@ -175,16 +175,16 @@
   "cost_model": {
     "formula_pairwise": "N*M",
     "formula_layered": "|E| + N + M + (1-p)*N*M",
-    "E_measured": 79,
+    "E_measured": 78,
     "N": 8,
-    "M": 8,
+    "M": 10,
     "p": 0.6,
     "crossover_N_by_p": {
-      "p=0.4": 39.55,
-      "p=0.5": 29.0,
-      "p=0.6": 22.89,
-      "p=0.8": 16.11,
-      "p=1.0": 12.43
+      "p=0.4": 29.33,
+      "p=0.5": 22.0,
+      "p=0.6": 17.6,
+      "p=0.8": 12.57,
+      "p=1.0": 9.78
     },
     "note": "E 为本语料测得的 (dialect, dialect) 转换边数，作为'每条层间边界实现一次'的成本单位。N、M、p 必须由作者核实来源后填入并在报告中说明取值依据。"
   },

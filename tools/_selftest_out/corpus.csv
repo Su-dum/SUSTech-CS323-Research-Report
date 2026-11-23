@@ -1,0 +1,13 @@
+relpath,area_kind,area_name,own_ns,src_ns,dst_ns,conv_note,n_lines,n_ops,n_dialects,dialects
+test/Conversion/ArithToLLVM/arith-to-llvm.mlir,Conversion,ArithToLLVM,,arith,llvm,,6,4,3,arith:1;func:1;llvm:2
+test/Conversion/GPUCommon/common.mlir,Conversion,GPUCommon,,*,*,GPU 公共降级工具的测试夹具，源与目标都不定,5,3,1,gpu:3
+test/Conversion/GPUToNVVM/lower-gpu-to-nvvm.mlir,Conversion,GPUToNVVM,,gpu,nvvm,,8,6,3,gpu:4;memref:1;nvvm:1
+test/Conversion/MemRefToLLVM/memref-to-llvm.mlir,Conversion,MemRefToLLVM,,memref,llvm,,5,3,3,func:1;llvm:1;memref:1
+test/Conversion/SCFToControlFlow/for-to-cf.mlir,Conversion,SCFToControlFlow,,scf,cf,,9,4,3,cf:2;func:1;scf:1
+test/Conversion/TosaToArith/tosa-to-arith.mlir,Conversion,TosaToArith,,tosa,arith,,4,2,2,func:1;tosa:1
+test/Conversion/TosaToLinalg/tosa-to-linalg.mlir,Conversion,TosaToLinalg,,tosa,linalg,,5,3,3,func:1;linalg:1;tosa:1
+test/Dialect/Linalg/matmul.mlir,Dialect,Linalg,linalg,,,,15,8,4,arith:3;func:1;linalg:3;tensor:1
+test/Dialect/SCF/for-loop.mlir,Dialect,SCF,scf,,,,7,4,4,arith:1;func:1;memref:1;scf:1
+test/Dialect/Vector/vector-transpose.mlir,Dialect,Vector,vector,,,,6,4,3,arith:1;func:1;vector:2
+test/Target/LLVMIR/export.mlir,Target,LLVMIR,,,,,4,3,1,llvm:3
+test/Transforms/canonicalize.mlir,Transforms,canonicalize.mlir,,,,,4,2,2,arith:1;func:1

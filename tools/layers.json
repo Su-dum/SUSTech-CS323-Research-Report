@@ -1,0 +1,291 @@
+{
+  "_comment": [
+    "抽象层级划分配置：dialect 命名空间 -> 层级 id。",
+    "这是整项实验里唯一带主观判断的地方，也是你自己的学术贡献之一。",
+    "请逐条审查、按你的理由修改，并在报告 §4 用一两句话说明划分依据与被归入 crosslayer 的判准。",
+    "noise_dialects 是从统计中剔除的非方言命名空间，剔除理由写在 justification 里，必须在报告的方法节交代。",
+    "凡未列出的 dialect 会落入 other，脚本会在 meta.json 里报告，便于你发现遗漏。"
+  ],
+  "layers": [
+    {
+      "id": "frontend",
+      "label_zh": "框架/算子集导入层",
+      "label_en": "framework / op-set import",
+      "order": 1,
+      "rationale": "承接深度学习框架或标准算子集，语义最贴近模型图，硬件无关。",
+      "dialects": [
+        "torch",
+        "tosa",
+        "stablehlo",
+        "mhlo",
+        "onnx",
+        "ml_program"
+      ]
+    },
+    {
+      "id": "tensor",
+      "label_zh": "张量代数/结构化计算层",
+      "label_en": "tensor algebra / structured computation",
+      "order": 2,
+      "rationale": "以张量语义与结构化算子描述计算，是循环与并行变换的主要作用对象。",
+      "dialects": [
+        "linalg",
+        "tensor",
+        "sparse_tensor",
+        "quant",
+        "complex"
+      ]
+    },
+    {
+      "id": "parallel",
+      "label_zh": "并行与控制抽象层",
+      "label_en": "parallelism / control abstraction",
+      "order": 3,
+      "rationale": "描述并行执行、控制流与调度策略，尚未绑定具体存储与指令。",
+      "dialects": [
+        "scf",
+        "affine",
+        "cf",
+        "async",
+        "omp",
+        "gpu",
+        "shard",
+        "mpi"
+      ]
+    },
+    {
+      "id": "memory_vector",
+      "label_zh": "存储与向量层",
+      "label_en": "memory / vector",
+      "order": 4,
+      "rationale": "把抽象值落到缓冲区与机器向量，是语义损失最集中的一段。",
+      "dialects": [
+        "memref",
+        "vector",
+        "bufferization",
+        "ptr",
+        "emitc"
+      ]
+    },
+    {
+      "id": "target",
+      "label_zh": "硬件目标层",
+      "label_en": "hardware target",
+      "order": 5,
+      "rationale": "直接对应 LLVM IR、SPIR-V 或某厂商指令集，硬件知识在此层进入。",
+      "dialects": [
+        "llvm",
+        "spirv",
+        "nvvm",
+        "nvgpu",
+        "rocdl",
+        "amdgpu",
+        "x86",
+        "arm_neon",
+        "arm_sve",
+        "arm_sme",
+        "xegpu",
+        "vcix",
+        "wasmssa",
+        "acc",
+        "xevm"
+      ]
+    }
+  ],
+  "crosslayer": {
+    "_comment": "贯穿全栈的通用方言。它们不属于单一层，正是'跨层通用语'这一现象的证据，只在共现分析中使用。",
+    "dialects": [
+      "builtin",
+      "func",
+      "arith",
+      "math",
+      "index",
+      "ub",
+      "shape"
+    ]
+  },
+  "noise_dialects": {
+    "_comment": [
+      "以下命名空间不是真实的上游领域方言，或不是方言，统计时剔除。",
+      "每条都可用 tools/diagnose_namespaces.py 复查样例行。"
+    ],
+    "justification": {
+      "test": "MLIR 自带的 TestDialect，用于测试编译框架自身特性，不是领域方言",
+      "toy": "Toy 教程方言（test/Examples/Toy）",
+      "testd": "IRDL 测试用声明式方言",
+      "testvar": "IRDL 变参测试方言",
+      "test_irdl_to_cpp": "IRDL 到 C++ 生成器的测试方言",
+      "test_dyn": "IR 解析器测试用例中的临时方言名",
+      "foo": "测试夹具占位方言",
+      "some": "测试夹具占位方言（LLVMIR types 测试）",
+      "dummy": "测试夹具占位方言（bufferization 测试）",
+      "prevent": "测试夹具：prevent.dce，用于阻止 DCE",
+      "magic": "测试夹具占位方言",
+      "produce": "测试夹具占位方言",
+      "live": "测试夹具：live.user，用于符号存活测试",
+      "consume": "测试夹具占位方言",
+      "dialect": "测试夹具占位方言",
+      "unknown": "字节码未注册方言测试用例",
+      "unregistered": "未注册方言测试用例",
+      "unregistered_dialect": "未注册方言测试用例",
+      "other_dialect": "transform 解释器测试夹具",
+      "my": "测试夹具占位方言",
+      "ab": "测试夹具占位方言",
+      "array": "属性解析测试中的伪方言",
+      "simple": "mlir-translate 未注册方言测试",
+      "typed": "EmitC 类型测试中的伪算子",
+      "cmath": "IRDL 测试中声明的示例方言",
+      "bytecode": "字节码格式测试中的伪算子与 dialect_resources 块属性条目",
+      "xla": "op-stats 测试中的伪方言名",
+      "tf": "PDL 集成测试中的伪方言名",
+      "i32": "WAT（WebAssembly 文本）片段，非 MLIR",
+      "i64": "WAT 片段，非 MLIR",
+      "f32": "WAT 片段，非 MLIR",
+      "f64": "WAT 片段，非 MLIR",
+      "local": "WAT 片段，非 MLIR",
+      "global": "WAT 片段，非 MLIR",
+      "iree": "非上游方言，本语料中不应出现"
+    },
+    "dialects": [
+      "test",
+      "toy",
+      "testd",
+      "testvar",
+      "test_irdl_to_cpp",
+      "test_dyn",
+      "foo",
+      "some",
+      "dummy",
+      "prevent",
+      "magic",
+      "produce",
+      "live",
+      "consume",
+      "dialect",
+      "unknown",
+      "unregistered",
+      "unregistered_dialect",
+      "other_dialect",
+      "my",
+      "ab",
+      "array",
+      "simple",
+      "typed",
+      "cmath",
+      "bytecode",
+      "xla",
+      "tf",
+      "i32",
+      "i64",
+      "f32",
+      "f64",
+      "local",
+      "global",
+      "iree"
+    ]
+  },
+  "aliases": {
+    "_comment": "Conversion 目录名（CamelCase）到 dialect 命名空间（小写）的映射，用于把 XToY 目录解析成层间边。",
+    "ControlFlow": "cf",
+    "Standard": "cf",
+    "MemRef": "memref",
+    "OpenACC": "acc",
+    "OpenMP": "omp",
+    "X86Vector": "x86",
+    "ArmNeon": "arm_neon",
+    "ArmSVE": "arm_sve",
+    "ArmSME": "arm_sme",
+    "XeVM": "xevm",
+    "XeGPU": "xegpu",
+    "Vector": "vector",
+    "Index": "index",
+    "Complex": "complex",
+    "Func": "func",
+    "Math": "math",
+    "UB": "ub",
+    "PDL": "pdl",
+    "PDLInterp": "pdl_interp",
+    "Tosa": "tosa",
+    "Linalg": "linalg",
+    "Tensor": "tensor",
+    "Shape": "shape",
+    "Quant": "quant",
+    "EmitC": "emitc",
+    "SPIRV": "spirv",
+    "NVVM": "nvvm",
+    "NVGPU": "nvgpu",
+    "ROCDL": "rocdl",
+    "AMDGPU": "amdgpu",
+    "GPU": "gpu",
+    "SCF": "scf",
+    "Affine": "affine",
+    "Arith": "arith",
+    "LLVM": "llvm",
+    "Builtin": "builtin",
+    "WasmSSA": "wasmssa",
+    "RaiseWasm": "wasmssa",
+    "SMT": "smt",
+    "MPI": "mpi",
+    "Ptr": "ptr",
+    "UBToLLVM": "ub",
+    "Bufferization": "bufferization",
+    "Async": "async",
+    "Shard": "shard",
+    "DLTI": "dlti",
+    "IRDL": "irdl"
+  },
+  "infra": {
+    "_comment": "编译器基础设施方言：描述编译过程本身（调度、匹配、方言定义、求解），不属于被编译程序的抽象层。单独统计并报告，不参与层映射。",
+    "dialects": [
+      "transform",
+      "pdl",
+      "pdl_interp",
+      "irdl",
+      "dlti",
+      "smt"
+    ]
+  },
+  "conversion_overrides": {
+    "_comment": "Conversion 目录名无法用简单的 XToY 拆分时的人工覆盖。src/dst 用 dialect 命名空间；src 为 * 表示源方言不定（不计入层间边）。",
+    "TosaToSPIRVTosa": {
+      "src": "tosa",
+      "dst": "spirv",
+      "note": "TOSA 算子集降到 SPIR-V"
+    },
+    "MathToFuncs": {
+      "src": "math",
+      "dst": "func",
+      "note": "math 降为 libm 等函数调用"
+    },
+    "ConvertToSPIRV": {
+      "src": "*",
+      "dst": "spirv",
+      "note": "泛化的“转换为 SPIR-V”目录"
+    },
+    "ConvertToEmitC": {
+      "src": "*",
+      "dst": "emitc",
+      "note": "泛化的“转换为 EmitC”目录"
+    },
+    "RaiseWasm": {
+      "src": "wasmssa",
+      "dst": "*",
+      "note": "反向（raising）转换：WasmSSA 提升为 math/arith/cf，方向与下降相反，不计入层间边"
+    },
+    "GPUCommon": {
+      "src": "*",
+      "dst": "*",
+      "note": "GPU 公共降级工具的测试夹具，源与目标都不定"
+    },
+    "LLVMCommon": {
+      "src": "*",
+      "dst": "*",
+      "note": "LLVM 公共降级工具的测试夹具"
+    },
+    "ReconcileUnrealizedCasts": {
+      "src": "*",
+      "dst": "*",
+      "note": "清理 unrealized_conversion_cast，不属于抽象层之间的转换"
+    }
+  }
+}

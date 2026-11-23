@@ -1,0 +1,198 @@
+{
+  "sample": {
+    "n_files": 3329
+  },
+  "structure": {
+    "n_distinct_dialect_pairs": 79,
+    "layer_matrix": {
+      "frontend->frontend": 0,
+      "frontend->tensor": 9,
+      "frontend->parallel": 2,
+      "frontend->memory_vector": 0,
+      "frontend->target": 10,
+      "tensor->frontend": 0,
+      "tensor->tensor": 1,
+      "tensor->parallel": 3,
+      "tensor->memory_vector": 0,
+      "tensor->target": 5,
+      "parallel->frontend": 0,
+      "parallel->tensor": 0,
+      "parallel->parallel": 25,
+      "parallel->memory_vector": 5,
+      "parallel->target": 57,
+      "memory_vector->frontend": 0,
+      "memory_vector->tensor": 0,
+      "memory_vector->parallel": 6,
+      "memory_vector->memory_vector": 8,
+      "memory_vector->target": 44,
+      "target->frontend": 0,
+      "target->tensor": 0,
+      "target->parallel": 2,
+      "target->memory_vector": 0,
+      "target->target": 114
+    },
+    "layer_out_degree": {
+      "target": 116,
+      "parallel": 87,
+      "memory_vector": 58,
+      "frontend": 21,
+      "tensor": 9
+    },
+    "layer_in_degree": {
+      "target": 230,
+      "parallel": 38,
+      "memory_vector": 13,
+      "tensor": 10
+    },
+    "top_dialect_edges": [
+      {
+        "src": "amdgpu",
+        "dst": "rocdl",
+        "files": 42
+      },
+      {
+        "src": "wasmssa",
+        "dst": "*",
+        "files": 42
+      },
+      {
+        "src": "spirv",
+        "dst": "llvm",
+        "files": 25
+      },
+      {
+        "src": "xegpu",
+        "dst": "xevm",
+        "files": 20
+      },
+      {
+        "src": "gpu",
+        "dst": "spirv",
+        "files": 14
+      },
+      {
+        "src": "func",
+        "dst": "llvm",
+        "files": 13
+      },
+      {
+        "src": "gpu",
+        "dst": "rocdl",
+        "files": 13
+      },
+      {
+        "src": "gpu",
+        "dst": "nvvm",
+        "files": 12
+      },
+      {
+        "src": "memref",
+        "dst": "llvm",
+        "files": 10
+      },
+      {
+        "src": "acc",
+        "dst": "llvm",
+        "files": 10
+      },
+      {
+        "src": "tosa",
+        "dst": "spirv",
+        "files": 10
+      },
+      {
+        "src": "vector",
+        "dst": "llvm",
+        "files": 10
+      },
+      {
+        "src": "arith",
+        "dst": "amdgpu",
+        "files": 9
+      },
+      {
+        "src": "vector",
+        "dst": "xegpu",
+        "files": 9
+      },
+      {
+        "src": "scf",
+        "dst": "spirv",
+        "files": 8
+      }
+    ],
+    "deepest_layers": [
+      "target"
+    ],
+    "share_edges_landing_in_deepest_layers": 0.7903780068728522
+  },
+  "cooccurrence": {
+    "dialect_document_frequency": {
+      "func": 2289,
+      "arith": 1515,
+      "llvm": 660,
+      "memref": 645,
+      "vector": 504,
+      "scf": 459,
+      "linalg": 452,
+      "tensor": 398,
+      "gpu": 333,
+      "transform": 333,
+      "omp": 248,
+      "spirv": 199,
+      "bufferization": 191,
+      "affine": 183,
+      "nvvm": 168,
+      "sparse_tensor": 160,
+      "cf": 150,
+      "acc": 111,
+      "math": 103,
+      "tosa": 81,
+      "xegpu": 64,
+      "wasmssa": 55,
+      "amdgpu": 54,
+      "emitc": 52,
+      "ub": 34,
+      "builtin": 32,
+      "complex": 31,
+      "index": 28,
+      "arm_sme": 27,
+      "xevm": 26
+    },
+    "share_of_files_containing_a_crosslayer_dialect": 0.707720036046861
+  },
+  "investment": {
+    "files_per_layer": {
+      "target": 259,
+      "parallel": 235,
+      "tensor": 232,
+      "memory_vector": 222,
+      "frontend": 56
+    },
+    "crosslayer_files": 73,
+    "total": 3329
+  },
+  "cost_model": {
+    "formula_pairwise": "N*M",
+    "formula_layered": "|E| + N + M + (1-p)*N*M",
+    "E_measured": 79,
+    "N": 8,
+    "M": 8,
+    "p": 0.6,
+    "crossover_N_by_p": {
+      "p=0.4": 39.55,
+      "p=0.5": 29.0,
+      "p=0.6": 22.89,
+      "p=0.8": 16.11,
+      "p=1.0": 12.43
+    },
+    "note": "E 为本语料测得的 (dialect, dialect) 转换边数，作为'每条层间边界实现一次'的成本单位。N、M、p 必须由作者核实来源后填入并在报告中说明取值依据。"
+  },
+  "interpretation": {
+    "_instructions": "以下字段必须由报告作者本人填写；null 表示分析尚未完成。",
+    "H1_convergence": null,
+    "H2_asymmetry": null,
+    "H3_conditional_benefit": null,
+    "threats_to_validity": null
+  }
+}

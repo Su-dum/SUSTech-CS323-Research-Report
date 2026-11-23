@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="540" viewBox="0 0 900 540" font-family="Helvetica,Arial,sans-serif">
+<rect width="900" height="540" fill="#ffffff"/>
+<text x="24.0" y="30.0" font-size="15" text-anchor="start" fill="#222" font-weight="bold" opacity="1.0">层间转换强度（按抽象层聚合）</text>
+<text x="24.0" y="50.0" font-size="10.5" text-anchor="start" fill="#666" font-weight="normal" opacity="1.0">线宽 ∝ 该层间转换对应的 Conversion 测试文件数；弧线自左（源层）指向右（目标层）</text>
+<rect x="66.0" y="106.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="150.0" y="126.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">框架/算子集导入层</text>
+<text x="150.0" y="141.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">frontend</text>
+<rect x="666.0" y="106.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="750.0" y="126.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">框架/算子集导入层</text>
+<text x="750.0" y="141.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">frontend</text>
+<rect x="66.0" y="190.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="150.0" y="210.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">张量代数/结构化计算层</text>
+<text x="150.0" y="225.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">tensor</text>
+<rect x="666.0" y="190.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="750.0" y="210.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">张量代数/结构化计算层</text>
+<text x="750.0" y="225.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">tensor</text>
+<rect x="66.0" y="274.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="150.0" y="294.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">并行与控制抽象层</text>
+<text x="150.0" y="309.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">parallel</text>
+<rect x="666.0" y="274.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="750.0" y="294.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">并行与控制抽象层</text>
+<text x="750.0" y="309.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">parallel</text>
+<rect x="66.0" y="358.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="150.0" y="378.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">存储与向量层</text>
+<text x="150.0" y="393.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">memory_vector</text>
+<rect x="666.0" y="358.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="750.0" y="378.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">存储与向量层</text>
+<text x="750.0" y="393.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">memory_vector</text>
+<rect x="66.0" y="442.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="150.0" y="462.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">硬件目标层</text>
+<text x="150.0" y="477.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">target</text>
+<rect x="666.0" y="442.0" width="168.0" height="44.0" rx="6" fill="#f5f7fa" stroke="#d5dbe3" stroke-width="1" opacity="1.0"/>
+<text x="750.0" y="462.0" font-size="11.5" text-anchor="middle" fill="#222" font-weight="bold" opacity="1.0">硬件目标层</text>
+<text x="750.0" y="477.0" font-size="9.5" text-anchor="middle" fill="#8a94a6" font-weight="normal" opacity="1.0">target</text>
+<path d="M 116.0 190.0 C 130.0 170.0 170.0 170.0 184.0 190.0" fill="none" stroke="#59A14F" stroke-width="2.523902973898033" opacity="0.65" stroke-linecap="round"/>
+<text x="76.0" y="227.0" font-size="9" text-anchor="start" fill="#8a94a6" font-weight="normal" opacity="1.0">层内 1</text>
+<path d="M 234.0 464.0 C 450.0 464.0 450.0 296.0 666.0 296.0" fill="none" stroke="#E15759" stroke-width="2.9894388284780526" opacity="0.42" stroke-linecap="round"/>
+<path d="M 234.0 128.0 C 450.0 128.0 450.0 296.0 666.0 296.0" fill="none" stroke="#4E79A7" stroke-width="2.9894388284780526" opacity="0.42" stroke-linecap="round"/>
+<path d="M 234.0 212.0 C 450.0 212.0 450.0 296.0 666.0 296.0" fill="none" stroke="#59A14F" stroke-width="3.3466570535691504" opacity="0.42" stroke-linecap="round"/>
+<path d="M 234.0 212.0 C 450.0 212.0 450.0 464.0 666.0 464.0" fill="none" stroke="#59A14F" stroke-width="3.913123449750173" opacity="0.42" stroke-linecap="round"/>
+<path d="M 234.0 296.0 C 450.0 296.0 450.0 380.0 666.0 380.0" fill="none" stroke="#F28E2B" stroke-width="3.913123449750173" opacity="0.42" stroke-linecap="round"/>
+<path d="M 234.0 380.0 C 450.0 380.0 450.0 296.0 666.0 296.0" fill="none" stroke="#B07AA1" stroke-width="4.152988806446741" opacity="0.42" stroke-linecap="round"/>
+<path d="M 116.0 358.0 C 130.0 338.0 170.0 338.0 184.0 358.0" fill="none" stroke="#B07AA1" stroke-width="4.578877656956106" opacity="0.65" stroke-linecap="round"/>
+<text x="76.0" y="395.0" font-size="9" text-anchor="start" fill="#8a94a6" font-weight="normal" opacity="1.0">层内 8</text>
+<path d="M 234.0 128.0 C 450.0 128.0 450.0 212.0 666.0 212.0" fill="none" stroke="#4E79A7" stroke-width="4.771708921694097" opacity="0.42" stroke-linecap="round"/>
+<path d="M 234.0 128.0 C 450.0 128.0 450.0 464.0 666.0 464.0" fill="none" stroke="#4E79A7" stroke-width="4.954093266554555" opacity="0.42" stroke-linecap="round"/>
+<path d="M 116.0 274.0 C 130.0 254.0 170.0 254.0 184.0 274.0" fill="none" stroke="#F28E2B" stroke-width="7.019514869490164" opacity="0.65" stroke-linecap="round"/>
+<text x="76.0" y="311.0" font-size="9" text-anchor="start" fill="#8a94a6" font-weight="normal" opacity="1.0">层内 25</text>
+<path d="M 234.0 380.0 C 450.0 380.0 450.0 464.0 666.0 464.0" fill="none" stroke="#B07AA1" stroke-width="8.855128930368746" opacity="0.42" stroke-linecap="round"/>
+<path d="M 234.0 296.0 C 450.0 296.0 450.0 464.0 666.0 464.0" fill="none" stroke="#F28E2B" stroke-width="9.885281374238572" opacity="0.42" stroke-linecap="round"/>
+<path d="M 116.0 442.0 C 130.0 422.0 170.0 422.0 184.0 442.0" fill="none" stroke="#E15759" stroke-width="13.4" opacity="0.65" stroke-linecap="round"/>
+<text x="76.0" y="479.0" font-size="9" text-anchor="start" fill="#8a94a6" font-weight="normal" opacity="1.0">层内 114</text>
+<text x="150.0" y="92.0" font-size="10.5" text-anchor="middle" fill="#555" font-weight="bold" opacity="1.0">源层（括号内为出度）</text>
+<text x="750.0" y="92.0" font-size="10.5" text-anchor="middle" fill="#555" font-weight="bold" opacity="1.0">目标层（括号内为入度）</text>
+<text x="56.0" y="132.0" font-size="10" text-anchor="end" fill="#5a6472" font-weight="normal" opacity="1.0">(21)</text>
+<text x="844.0" y="132.0" font-size="10" text-anchor="start" fill="#5a6472" font-weight="normal" opacity="1.0">(0)</text>
+<text x="56.0" y="216.0" font-size="10" text-anchor="end" fill="#5a6472" font-weight="normal" opacity="1.0">(9)</text>
+<text x="844.0" y="216.0" font-size="10" text-anchor="start" fill="#5a6472" font-weight="normal" opacity="1.0">(10)</text>
+<text x="56.0" y="300.0" font-size="10" text-anchor="end" fill="#5a6472" font-weight="normal" opacity="1.0">(87)</text>
+<text x="844.0" y="300.0" font-size="10" text-anchor="start" fill="#5a6472" font-weight="normal" opacity="1.0">(38)</text>
+<text x="56.0" y="384.0" font-size="10" text-anchor="end" fill="#5a6472" font-weight="normal" opacity="1.0">(58)</text>
+<text x="844.0" y="384.0" font-size="10" text-anchor="start" fill="#5a6472" font-weight="normal" opacity="1.0">(13)</text>
+<text x="56.0" y="468.0" font-size="10" text-anchor="end" fill="#5a6472" font-weight="normal" opacity="1.0">(116)</text>
+<text x="844.0" y="468.0" font-size="10" text-anchor="start" fill="#5a6472" font-weight="normal" opacity="1.0">(230)</text>
+</svg>

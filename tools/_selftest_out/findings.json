@@ -1,0 +1,130 @@
+{
+  "sample": {
+    "n_files": 12
+  },
+  "structure": {
+    "n_distinct_dialect_pairs": 6,
+    "layer_matrix": {
+      "frontend->frontend": 0,
+      "frontend->tensor": 1,
+      "frontend->parallel": 0,
+      "frontend->memory_vector": 0,
+      "frontend->target": 0,
+      "tensor->frontend": 0,
+      "tensor->tensor": 0,
+      "tensor->parallel": 0,
+      "tensor->memory_vector": 0,
+      "tensor->target": 0,
+      "parallel->frontend": 0,
+      "parallel->tensor": 0,
+      "parallel->parallel": 1,
+      "parallel->memory_vector": 0,
+      "parallel->target": 1,
+      "memory_vector->frontend": 0,
+      "memory_vector->tensor": 0,
+      "memory_vector->parallel": 0,
+      "memory_vector->memory_vector": 0,
+      "memory_vector->target": 1,
+      "target->frontend": 0,
+      "target->tensor": 0,
+      "target->parallel": 0,
+      "target->memory_vector": 0,
+      "target->target": 0
+    },
+    "layer_out_degree": {
+      "parallel": 2,
+      "memory_vector": 1,
+      "frontend": 1
+    },
+    "layer_in_degree": {
+      "target": 2,
+      "parallel": 1,
+      "tensor": 1
+    },
+    "top_dialect_edges": [
+      {
+        "src": "arith",
+        "dst": "llvm",
+        "files": 1
+      },
+      {
+        "src": "gpu",
+        "dst": "nvvm",
+        "files": 1
+      },
+      {
+        "src": "memref",
+        "dst": "llvm",
+        "files": 1
+      },
+      {
+        "src": "scf",
+        "dst": "cf",
+        "files": 1
+      },
+      {
+        "src": "tosa",
+        "dst": "arith",
+        "files": 1
+      },
+      {
+        "src": "tosa",
+        "dst": "linalg",
+        "files": 1
+      }
+    ],
+    "deepest_layers": [
+      "target"
+    ],
+    "share_edges_landing_in_deepest_layers": 0.5
+  },
+  "cooccurrence": {
+    "dialect_document_frequency": {
+      "func": 9,
+      "arith": 5,
+      "llvm": 3,
+      "memref": 3,
+      "gpu": 2,
+      "scf": 2,
+      "tosa": 2,
+      "linalg": 2,
+      "nvvm": 1,
+      "cf": 1,
+      "tensor": 1,
+      "vector": 1
+    },
+    "share_of_files_containing_a_crosslayer_dialect": 0.75
+  },
+  "investment": {
+    "files_per_layer": {
+      "tensor": 1,
+      "parallel": 1,
+      "memory_vector": 1
+    },
+    "crosslayer_files": 0,
+    "total": 12
+  },
+  "cost_model": {
+    "formula_pairwise": "N*M",
+    "formula_layered": "|E| + N + M + (1-p)*N*M",
+    "E_measured": 6,
+    "N": 8,
+    "M": 6,
+    "p": 0.6,
+    "crossover_N_by_p": {
+      "p=0.4": 8.57,
+      "p=0.5": 6.0,
+      "p=0.6": 4.62,
+      "p=0.8": 3.16,
+      "p=1.0": 2.4
+    },
+    "note": "E 为本语料测得的 (dialect, dialect) 转换边数，作为'每条层间边界实现一次'的成本单位。N、M、p 必须由作者核实来源后填入并在报告中说明取值依据。"
+  },
+  "interpretation": {
+    "_instructions": "以下字段必须由报告作者本人填写；null 表示分析尚未完成。",
+    "H1_convergence": null,
+    "H2_asymmetry": null,
+    "H3_conditional_benefit": null,
+    "threats_to_validity": null
+  }
+}

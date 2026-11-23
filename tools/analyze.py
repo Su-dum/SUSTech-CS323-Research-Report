@@ -247,7 +247,9 @@ def load(corpus_path: Path, cfg: dict):
         for ns in L["dialects"]:
             ns2layer[ns] = L["id"]
     cross = set(cfg.get("crosslayer", {}).get("dialects", []))
-    return rows, order, ns2layer, cross
+    infra = set(cfg.get("infra", {}).get("dialects", []))
+    noise = set(cfg.get("noise_dialects", {}).get("dialects", []))
+    return rows, order, ns2layer, cross, infra, noise
 
 
 # ---------------------------------------------------------------- 图 1
@@ -489,15 +491,15 @@ def write_facts(path: Path, ctx: dict):
     for (s, d), c in ef.items():
         dst[d] += c
         src[s] += c
-    for d, c in ctx["unattributed"].items():
-        if not d.startswith("src:"):
-            dst[d] += c
     dst.pop("*", None)
+    # 注意：dst/src 只统计"两端都确定的"转换边（ef）。一端不定的目录只在 §6 单列，
+    # 不混进本表 —— 否则同一个方言会出现两套"文件数"（如 spirv 57 vs 72），引用时极易拿错。
     deepest = {L["id"] for L in order if L["order"] == max(x["order"] for x in order)}
     into_target = sum(c for (s, d), c in le.items() if d in deepest)
     total_le = sum(le.values())
+    # 层内边：只取"最深的那批层"内部的转换（主划分 = target→target；替代划分 = vendor→vendor）
     tt = sorted(((s, d, c) for (s, d), c in ef.items()
-                 if ns2layer.get(s) == "target" and ns2layer.get(d) == "target"),
+                 if ns2layer.get(s) in deepest and ns2layer.get(d) in deepest),
                 key=lambda x: -x[2])
     into_llvm = sorted(((s, c) for (s, d), c in ef.items() if d == "llvm"), key=lambda x: -x[1])
 
@@ -513,6 +515,8 @@ def write_facts(path: Path, ctx: dict):
     A(f"- 源方言 {len(src)} 个，目标方言 {len(dst)} 个\n")
 
     A("## 2. 目标端点收敛（入度，按 Conversion 文件数）\n")
+    A("> 本表只统计**两端都能解析为确定方言**的转换（即 `|E|` 所覆盖的那些文件）。")
+    A("> 一端不定的目录（如 `ConvertToSPIRV`）不计入本表，另见 §6。\n")
     A("| 目标方言 | 所在层 | 文件数 |")
     A("|---|---|---|")
     for k, v in dst.most_common(12):
@@ -528,22 +532,36 @@ def write_facts(path: Path, ctx: dict):
     for a in layer_ids:
         A(f"| **{label[a]}** | " + " | ".join(str(le.get((a, b), 0)) for b in layer_ids) + " |")
     A("")
-    A(f"- 落到 `target` 层的边：**{into_target} / {total_le} = {into_target/total_le:.1%}**")
+    dl_name = ctx.get("deepest_label") or "/".join(sorted(deepest))
+    A(f"- 落到最深层（`{dl_name}`）的边：**{into_target} / {total_le} = {into_target/total_le:.1%}**")
     A(f"- 非零层对：**{sum(1 for v in le.values() if v)}** 个")
-    A(f"- `target` 层内部（target→target）：**{sum(c for _, _, c in tt)}** 个文件 / {len(tt)} 条边\n")
+    A(f"- 最深层内部的转换（层内边）：**{sum(c for _, _, c in tt)}** 个文件 / {len(tt)} 条边\n")
     if tt:
-        A("| target 内部转换 | 文件数 |")
+        A("| 层内转换（源 → 目标方言） | 文件数 |")
         A("|---|---|")
         for s, d, c in tt:
             A(f"| `{s}` → `{d}` | {c} |")
         A("")
 
     A("## 4. 各层测试投入\n")
-    A("| 层 | `test/Dialect/<X>` 文件数 |")
-    A("|---|---|")
+    A("| 层 | `test/Dialect/<X>` 文件数 | 占已归属 |")
+    A("|---|---|---|")
+    attributed_total = sum(ctx["layer_files"].values()) + ctx["cross_files"] + sum(
+        ctx.get("infra_files", {}).values())
     for k, v in ctx["layer_files"].most_common():
-        A(f"| {label.get(k, k)} | {v} |")
-    A(f"| 跨层通用方言（单列） | {ctx['cross_files']} |")
+        A(f"| {label.get(k, k)} | {v} | {v / attributed_total:.1%} |")
+    A(f"| 跨层通用方言（单列） | {ctx['cross_files']} | "
+      f"{ctx['cross_files'] / attributed_total:.1%} |")
+    for k, v in sorted(ctx.get("infra_files", {}).items(), key=lambda kv: -kv[1]):
+        A(f"| 编译器基础设施方言 `{k}` | {v} | {v / attributed_total:.1%} |")
+    A(f"\n已归属合计 **{attributed_total}** 个文件；全语料 {ctx['total_files']} 个。")
+    unmapped = ctx.get("unmapped") or {}
+    if unmapped:
+        A(f"\n> ⚠️ 未能归属到任何层的 Dialect 文件：**{sum(unmapped.values())}** 个 —— "
+          f"{', '.join(f'{k}({v})' for k, v in sorted(unmapped.items(), key=lambda kv: -kv[1]))}")
+        A("> 这些文件不在上表中，需在 layers.json 的 aliases 里补映射（见 tools/audit_attribution.py）。")
+    else:
+        A("\n> ✓ 所有 `test/Dialect/**` 文件均已归属（层 / 跨层 / 基础设施之一）。")
     A("")
 
     A("## 5. 两种成本口径（本报告的关键对比）\n")
@@ -559,6 +577,7 @@ def write_facts(path: Path, ctx: dict):
     A("")
     A("成本模型：`C_pair = N·M`，`C_layer = |E| + N + M + (1-p)·N·M`，"
       "交叉点 `N* = (|E| + M) / (p·M − 1)`。\n")
+    A(f"- M 的来源：{ctx.get('M_source', '未记录')}（实测值 = {ctx.get('M_measured', '?')}）")
     A(f"取 `N = {ctx['N']}`，`M = {ctx['M']}`，对 p 做敏感性分析：\n")
     A("| p | N\\*（分层开始占优的框架数） |")
     A("|---|---|")
@@ -606,7 +625,8 @@ def main(argv=None) -> int:
     ap.add_argument("--outdir", default="out")
     ap.add_argument("--config", default=None, help="layers.json 路径")
     ap.add_argument("--n-frameworks", type=int, default=8, help="N：框架数量（请自行核算并说明来源）")
-    ap.add_argument("--n-backends", type=int, default=6, help="M：后端数量（请自行核算并说明来源）")
+    ap.add_argument("--n-backends", type=int, default=None,
+                    help="M：后端数量。省略时自动采用实测值（target 层内作为转换目标的方言数）")
     ap.add_argument("--adoption", type=float, default=0.6, help="p：共享层采纳率 0~1（请自行估计并说明方法）")
     ap.add_argument("--topk", type=int, default=12, help="共现矩阵取前 k 个方言")
     ap.add_argument("--preview-png", action="store_true", help="额外输出 PNG 预览（需 Pillow）")
@@ -616,7 +636,7 @@ def main(argv=None) -> int:
     cfg_path = Path(args.config) if args.config else (Path(__file__).resolve().parent / "layers.json")
     cfg = json.loads(cfg_path.read_text(encoding="utf-8-sig"))
 
-    rows, order, ns2layer, cross = load(Path(args.corpus), cfg)
+    rows, order, ns2layer, cross, infra, noise = load(Path(args.corpus), cfg)
     layer_ids = [L["id"] for L in order]
     total_files = len(rows)
 
@@ -666,7 +686,8 @@ def main(argv=None) -> int:
     max_order = max(L["order"] for L in order)
     deepest = {L["id"] for L in order if L["order"] == max_order}
 
-    layer_files, cross_files = Counter(), 0
+    layer_files, cross_files, unmapped = Counter(), 0, Counter()
+    infra_files: Counter = Counter()
     for r in rows:
         if r["area_kind"] == "Dialect":
             ns = r.get("own_ns") or ""
@@ -675,18 +696,33 @@ def main(argv=None) -> int:
                 layer_files[L] += 1
             elif ns in cross:
                 cross_files += 1
+            elif ns in infra:
+                infra_files[ns] += 1
+            elif ns not in noise:
+                # 既不在任何层、也不在跨层/基础设施/噪声表里 —— 必须报警，不能静默丢弃
+                unmapped[ns or r["area_name"]] += 1
+
+    # ---- M 的取值：未显式指定时，用数据实测的"target 层内作为转换目标的方言数"
+    M_measured = len({d for (s, d) in edge_files if ns2layer.get(d) == "target"})
+    if args.n_backends is None:
+        M = M_measured
+        m_source = f"未指定 --n-backends，自动采用实测值 M={M}"
+    else:
+        M = args.n_backends
+        m_source = (f"显式指定 M={M}；实测值为 {M_measured}"
+                    + ("" if M == M_measured else "（与实测不一致，请说明理由）"))
 
     outdir.mkdir(parents=True, exist_ok=True)
     png = args.preview_png
     fig_funnel(outdir / "fig1_layer_transitions.svg", order, layer_edges, layer_out, layer_in, png)
     fig_cooccurrence(outdir / "fig2_dialect_cooccurrence.svg", cooc, df, args.topk, png)
     fig_cost(outdir / "fig3_cost_model.svg", len(edge_files), args.n_frameworks,
-             args.n_backends, args.adoption, png)
+             M, args.adoption, png)
     attributed = sum(layer_files.values()) + cross_files
     fig_investment(outdir / "fig4_layer_investment.svg", order, layer_files, cross_files,
                    total_files, png, attributed)
 
-    E, p, M = len(edge_files), args.adoption, args.n_backends
+    E, p = len(edge_files), args.adoption
     crossover = {}
     for pp in (0.4, 0.5, 0.6, 0.8, 1.0):
         denom = pp * M - 1
@@ -716,15 +752,20 @@ def main(argv=None) -> int:
         "investment": {
             "files_per_layer": dict(layer_files.most_common()),
             "crosslayer_files": cross_files,
+            "infra_files": dict(infra_files.most_common()),
+            "unmapped_files": dict(unmapped.most_common()),
+            "attributed_total": (sum(layer_files.values()) + cross_files
+                                 + sum(infra_files.values())),
             "total": total_files,
         },
         "cost_model": {
             "formula_pairwise": "N*M",
             "formula_layered": "|E| + N + M + (1-p)*N*M",
             "E_measured": E, "N": args.n_frameworks, "M": M, "p": p,
+            "M_measured": M_measured, "M_source": m_source,
             "crossover_N_by_p": crossover,
             "note": "E 为本语料测得的 (dialect, dialect) 转换边数，作为'每条层间边界实现一次'的成本单位。"
-                    "N、M、p 必须由作者核实来源后填入并在报告中说明取值依据。",
+                    "M 缺省时自动取实测值；N 与 p 必须由作者核实来源后填入并说明取值依据。",
         },
         "interpretation": {
             "_instructions": "以下字段必须由报告作者本人填写；null 表示分析尚未完成。",
@@ -737,15 +778,26 @@ def main(argv=None) -> int:
     (outdir / "findings.json").write_text(
         json.dumps(findings, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    meta_path = outdir / "meta.json"
-    meta = json.loads(meta_path.read_text(encoding="utf-8-sig")) if meta_path.is_file() else {}
+    # meta.json 优先取输出目录，其次取 corpus 所在目录（out_alt/ 没有自己的 meta.json）
+    meta = {}
+    for cand in (outdir / "meta.json", Path(args.corpus).parent / "meta.json"):
+        if cand.is_file():
+            meta = json.loads(cand.read_text(encoding="utf-8-sig"))
+            break
+    if meta and not (outdir / "meta.json").is_file():
+        # 让稳健性运行的输出目录也自带可复现记录（语料 commit、排除项等）
+        (outdir / "meta.json").write_text(
+            json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"     已复制 meta.json -> {outdir}")
+    n_ops_total = sum(r["n_ops"] for r in rows)   # 不依赖 meta，永远可算
     write_facts(outdir / "facts.md", dict(
         order=order, layer_edges=layer_edges, edge_files=edge_files, ns2layer=ns2layer,
-        total_files=total_files, n_ops=meta.get("n_ops_total", 0),
+        total_files=total_files, n_ops=n_ops_total,
         n_ops_excluded=meta.get("n_ops_excluded", 0),
         commit=meta.get("git_commit", "未记录"),
         conv_files=[r for r in rows if r["area_kind"] == "Conversion"],
         layer_files=layer_files, cross_files=cross_files, unattributed=unattributed,
+        infra_files=infra_files, unmapped=unmapped, M_source=m_source, M_measured=M_measured,
         N=args.n_frameworks, M=M, crossover=crossover,
     ))
 
@@ -763,8 +815,15 @@ def main(argv=None) -> int:
     for k, v in layer_files.most_common():
         print(f"  {k:<16}{v:>6}")
     print(f"  {'crosslayer':<16}{cross_files:>6}")
+    for k, v in sorted(infra_files.items(), key=lambda kv: -kv[1]):
+        print(f"  {'infra:' + k:<16}{v:>6}")
+    if unmapped:
+        print(f"\n⚠️ 未能归属到任何层的 Dialect 文件 {sum(unmapped.values())} 个："
+              + ", ".join(f"{k}({v})" for k, v in sorted(unmapped.items(), key=lambda kv: -kv[1])))
+        print("   跑 tools/audit_attribution.py 查，并在 layers.json 的 aliases 里补映射。")
 
     print(f"\n=== 成本模型 E={E}, N={args.n_frameworks}, M={M}, p={p} ===")
+    print(f"  {m_source}")
     for k, v in crossover.items():
         print(f"  分层开始占优的 N*（{k}）：{v}")
     print(f"\n[OK] {outdir / 'findings.json'}")

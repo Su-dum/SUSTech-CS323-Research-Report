@@ -1,0 +1,49 @@
+%% ============================================================
+%%  §3 MLIR 的机制：层级如何变成一等对象
+%%  要证明的一句话：
+%%    MLIR 没有让"层"消失，而是让层的位置与数量从框架的固定前提变成可协商对象；
+%%    四个机制各承担一部分，其中 op interface 是 N+M 可加性的技术根源。
+%%  素材：docs/06-section3-figure.md
+%%  建议篇幅：3.5 页（含图 2）
+%% ============================================================
+
+\section{机制：层级如何变成一等对象}
+\label{sec:mechanisms}
+
+%% 注意：本节不要写成"MLIR 有哪些 dialect"的目录复述。只讲撑论点的四个机制。
+
+%% ---- 机制 ①：dialect 把"一层"搬到库边界 ----
+%% 论点：算子集合 + 类型/属性 + 验证与规范化被整体做成可插拔单元，
+%% 因此新增一层不必改编译器内核。
+%% 引：MLIR CGO'21；ODS 文档。
+
+%% ---- 机制 ②：多级共存 + partial lowering（图 2 承担这一条） ----
+%% 论点：若层级不能共存于同一 module，就仍然只能整段一次性翻译，"分层"退化为"分阶段流水线"。
+%% 图 2 的证据：同一 module 内，@matmul 是整体结构化算子，@matvec 已显式化为 scf.for + 子算子，
+%% 两者都是合法 IR —— 所以下降可以是部分的。
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\linewidth]{figures/fig_mixed_levels.png}
+  \caption{同一 module 内的多级抽象共存。选自 \texttt{llvm-project@ba736172} 的
+  \texttt{mlir/test/Integration/Dialect/Linalg/CPU/matmul-vs-matvec.mlir}，节选 29 行，未改写；
+  左侧色条标出该行算子所属的抽象层。\texttt{@matmul} 以单个 \texttt{linalg.matmul} 表达
+  整个矩阵乘；\texttt{@matvec} 中同一计算已被显式化为 \texttt{scf.for} 循环与子算子
+  \texttt{linalg.matvec}。两者共存于同一 module，说明下降可以是部分的。}
+  \Description{带层级色条的 MLIR 代码片段，两个函数分别使用整算子与显式循环}
+  \label{fig:mixed-levels}
+\end{figure}
+
+%% ---- 机制 ③：op interface（本节最容易被写浅的地方） ----
+%% 浅写法："interface 让不同 dialect 共享同一套操作。"
+%% 有力写法："一条转换不必重写，因为它可以只依赖 interface 而不依赖具体方言。"
+%% 这正是 §4 里 |E| 能停留在 76 而不是爆炸的解释。
+%% 引：MLIR Interfaces 文档。
+
+%% ---- 机制 ④：conversion target / legality / type converter ----
+%% 论点：层与层之间的边界是"可声明"的契约，因此边界本身成为可检验对象。
+%% 一句伏笔：代价是 pass 顺序敏感、调试面变大（§6 展开）。
+%% 引：MLIR Dialect Conversion 文档。
+
+%% TODO(收束)：四个机制合起来说明——MLIR 不预设层数，而是提供"让层可被协商"的设施。
+%% 能力 != 效果：能否被采纳是下一节（§4 数据）与 §5（治理）的事。

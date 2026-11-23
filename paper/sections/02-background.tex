@@ -1,0 +1,64 @@
+%% ============================================================
+%%  §2 只选一层的代价：从 LLVM IR 到 XLA 与 Triton
+%%  要证明的一句话：
+%%    每个系统都把抽象层固定在某处；固定点越低则前端越厚、后端越薄，反之亦然。
+%%    这是权衡曲线，不是优劣排序。
+%%  素材：docs/05-section2-comparison.md
+%%  建议篇幅：2.0 页
+%% ============================================================
+
+\section{只选一层的代价}
+\label{sec:background}
+
+%% TODO(过渡)：§1 说"必须选层"，本节说明每个真实系统都选了、且选择可以被客观描述。
+
+%% TODO(LLVM IR)：目标无关 SSA IR；硬件知识全部推迟到 IR 之后（指令选择、调度、MC 层）。
+%% 正面用一句：LLVM IR 并非"不含硬件知识"，而是把它整体推迟。
+
+%% TODO(Halide)：算法/调度解耦（SIGGRAPH 2012；PLDI 2013）；同一算法配不同调度与后端。
+%% 这是"把硬件知识外置成调度"的早期形态。
+
+%% TODO(TVM)：两层——图级与算子级；硬件知识主要进入算子级调度。
+
+%% TODO(XLA)：三层流程（StableHLO 上的目标无关 pass -> 后端 HLO 级优化 -> LLVM codegen）；
+%% layout assignment 在 HLO 内部以显式 pass 出现。这里引官方那句"retargeting XLA should be
+%% significantly simpler and more scalable than implementing every existing op ... for new hardware"
+%% ——它说明"避免 N×M"是 XLA 自己写下的设计动机，本文的提法不是事后附会。
+
+%% TODO(Triton)：tile 级固定；且它本身就是 MLIR 上的一组 dialect（tt / ttg / nvg / amdg).
+%% 重要：不要写成"绕开通用层的反例"。它是 MLIR 的纵向用法（栈窄、方言少）。
+
+%% ---- 表 1：维度对比（客观维度，不做优劣判断） ----
+\begin{table}[t]
+  \caption{各系统把抽象层固定在何处，以及硬件知识与新前端的进入点。所有条目均为可核对的
+  机制描述，不含性能优劣判断。}
+  \label{tab:layer-fixing}
+  \small
+  \begin{tabularx}{\linewidth}{@{}l p{1.6cm} p{2.0cm} p{1.7cm} p{2.0cm} p{1.4cm}@{}}
+    \toprule
+    系统 & 固定的抽象层 & 硬件知识进入点 & 新增前端 & 新增后端 & 复用单位 \\
+    \midrule
+    LLVM IR & 一层：目标无关 SSA IR & 指令选择、调度、MC 层 & 生成 LLVM IR
+      & 实现 TargetLowering / ISel & pass \\
+    Halide & 一层：算法 + 调度 & 调度原语与后端 & 写算法（内嵌 DSL）
+      & 接入一个后端 & 调度原语 \\
+    TVM & 两层：图级 + 算子级 & 算子级调度与 target 下放 & 导入为图级 IR
+      & target 描述 + codegen / BYOC & 调度原语 \\
+    XLA & 一层：HLO & HLO 内部 pass 与后端重写 & 生成 StableHLO
+      & 实现 \texttt{Compiler} 接口 & HLO pass \\
+    Triton & 一层：tile 级 & tile 布局（\texttt{ttg}）与厂商方言 & 生成 tile 级程序
+      & 厂商方言 + lowering & dialect \\
+    MLIR & \textbf{不固定} & 任意 dialect 边界 & 定义前端 dialect
+      & 定义目标 dialect + 转换 & dialect / 转换 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+%% TODO(分析 A)：层的位置是守恒量——六行里没有一行"无层"，能变的只是选在哪。
+%% 所以说"有了 MLIR 就不用选层"是错的；正确的是"选层从架构决策变成可局部化的决策"。
+
+%% TODO(分析 B)：固定点越低，前端越厚、后端越薄。这是一条权衡曲线，
+%% 而最优固定点由 N 与 M 的相对大小决定——这一句把 §1 的成本模型与 §2 的权衡接起来。
+
+%% TODO(分析 C)：XLA 与 MLIR 是同一问题的两种答案，差别在"谁承担不确定性"：
+%% XLA 收进后端，MLIR 放到可重谈的 dialect 边界上。这直接引出 §5。

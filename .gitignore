@@ -90,6 +90,7 @@ paper/main.pdf
 
 # 本地 TeX 构建目录
 paper/build/
+paper/_preview/
 paper/.latexmk/
 
 # ============================================================

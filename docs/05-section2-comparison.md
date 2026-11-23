@@ -52,7 +52,7 @@ MLIR & 不固定 & 取决于 dialect & 任意 dialect 边界 & 定义前端 dial
 
 **TVM**：官方摘要明确写"exposes graph-level and operator-level optimizations"，并把"mapping to arbitrary hardware primitives"列为要解决的问题（[TVM, OSDI 2018 / arXiv:1802.04799](https://arxiv.org/abs/1802.04799)）。图级 IR 现为 Relax（早期为 Relay），算子级为 TensorIR，两者在 TVM 文档中并列（[tvm.apache.org/docs/arch](https://tvm.apache.org/docs/arch/index.html)）。硬件知识主要进入在**算子级调度**：tensor intrinsic、内存布局、以及 target 相关的下放规则。
 
-**XLA**：三段式流程是官方写明的——① 在 StableHLO 上做**目标无关**的 pass，并转成内部 HLO；② 交给后端做**目标相关**的 HLO 级优化；③ 后端生成 LLVM IR 再交给 LLVM（[XLA architecture](https://github.com/openxla/xla/blob/main/docs/architecture.md)）。layout 在 HLO 内部就以显式 pass 的形式被指派（[From HLO to Thunks § Layout assignment passes](https://github.com/openxla/xla/blob/main/docs/hlo_to_thunks.md)）。新后端的路径是"实现 `xla::Compiler` 接口"（[Developing a new backend](https://github.com/openxla/xla/blob/main/docs/developing_new_backend.md)）。
+**XLA**：三段式流程是官方写明的——① 在 StableHLO 上做**目标无关**的 pass，并转成内部 HLO；② 交给后端做**目标相关**的 HLO 级优化；③ 后端生成 LLVM IR 再交给 LLVM（[XLA architecture](https://github.com/openxla/xla/blob/main/docs/architecture.md)；而下面引的 "Retargeting XLA…" 那句出自 [developing_new_backend.md](https://github.com/openxla/xla/blob/main/docs/developing_new_backend.md)，不是 architecture.md）。layout 在 HLO 内部就以显式 pass 的形式被指派（[From HLO to Thunks § Layout assignment passes](https://github.com/openxla/xla/blob/main/docs/hlo_to_thunks.md)）。新后端的路径是"实现 `xla::Compiler` 接口"（[Developing a new backend](https://github.com/openxla/xla/blob/main/docs/developing_new_backend.md)）。
 
 > ⚠️ **这一条是全节最有力的引用**。XLA 官方文档原话：
 > "Retargeting XLA should be significantly simpler and more scalable than implementing every existing op from a frontend framework such as PyTorch or TensorFlow for new hardware."
@@ -163,7 +163,8 @@ MLIR & 不固定 & 取决于 dialect & 任意 dialect 边界 & 定义前端 dial
   title     = {{MLIR}: Scaling Compiler Infrastructure for Domain Specific Computation},
   booktitle = {Proceedings of the IEEE/ACM International Symposium on Code Generation and Optimization (CGO)},
   pages     = {2--14},
-  year      = {2021}
+  year      = {2021},
+  doi       = {10.1109/CGO51591.2021.9370308}
 }
 
 @misc{xla_arch,
@@ -206,4 +207,5 @@ MLIR & 不固定 & 取决于 dialect & 任意 dialect 边界 & 定义前端 dial
 
 其余已确认：`halide13` DOI/页码 519–530；`tvm18` pages 578–594（USENIX BibTeX）；`triton19` DOI/页码 10–19；`mlir21` pages 2–14（[mlir.llvm.org/pubs](https://mlir.llvm.org/pubs/)）。
 
-> 仍未核的一点：`mlir21` 的 IEEE DOI 我未取到，定稿时若要用 doi 字段请自行补。宁可缺字段，不要写错。
+> `mlir21` 的 DOI 已补：IEEE CGO 2021 的 `10.1109/CGO51591.2021.9370308`（pages 2–14）。
+> 另：XLA 的 "Retargeting XLA…" 引文出自 `developing_new_backend.md`；早前标成 architecture.md 是错的，已更正。

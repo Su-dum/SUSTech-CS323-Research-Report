@@ -1,0 +1,198 @@
+%% ============================================================
+%%  references.bib
+%%  说明：
+%%   - 前 18 条已用 Crossref / USENIX 官方 BibTeX / 官方文档逐条核对（2026-11-23）。
+%%   - llvm04 与 halide12 两处曾写错，已按 Crossref 修正（DOI 与页码）。
+%%   - mlir21 的 IEEE DOI 未取到；若要用 doi 字段请自行补，宁缺勿错。
+%% ============================================================
+
+%% ---------------- 系统与论文 ----------------
+
+@inproceedings{llvm04,
+  author    = {Lattner, Chris and Adve, Vikram},
+  title     = {{LLVM}: A Compilation Framework for Lifelong Program Analysis \& Transformation},
+  booktitle = {Proceedings of the International Symposium on Code Generation and Optimization (CGO)},
+  pages     = {75--86},
+  year      = {2004},
+  doi       = {10.1109/CGO.2004.1281665}
+}
+
+@inproceedings{halide13,
+  author    = {Ragan-Kelley, Jonathan and Barnes, Connelly and Adams, Andrew and Paris, Sylvain and Durand, Fr{\'e}do and Amarasinghe, Saman},
+  title     = {Halide: A Language and Compiler for Optimizing Parallelism, Locality, and Recomputation in Image Processing Pipelines},
+  booktitle = {Proceedings of the 34th ACM SIGPLAN Conference on Programming Language Design and Implementation (PLDI)},
+  pages     = {519--530},
+  year      = {2013},
+  doi       = {10.1145/2491956.2462176}
+}
+
+@article{halide12,
+  author  = {Ragan-Kelley, Jonathan and Adams, Andrew and Paris, Sylvain and Levoy, Marc and Amarasinghe, Saman and Durand, Fr{\'e}do},
+  title   = {Decoupling Algorithms from Schedules for Easy Optimization of Image Processing Pipelines},
+  journal = {ACM Transactions on Graphics},
+  volume  = {31},
+  number  = {4},
+  pages   = {1--12},
+  year    = {2012},
+  doi     = {10.1145/2185520.2185528}
+}
+
+@inproceedings{tvm18,
+  author    = {Chen, Tianqi and Moreau, Thierry and Jiang, Ziheng and Zheng, Lianmin and Yan, Eddie and Cowan, Meghan and Shen, Haichen and Wang, Leyuan and Hu, Yuwei and Ceze, Luis and Guestrin, Carlos and Krishnamurthy, Arvind},
+  title     = {{TVM}: An Automated End-to-End Optimizing Compiler for Deep Learning},
+  booktitle = {Proceedings of the 13th USENIX Symposium on Operating Systems Design and Implementation (OSDI)},
+  pages     = {578--594},
+  year      = {2018}
+}
+
+@inproceedings{triton19,
+  author    = {Tillet, Philippe and Kung, H. T. and Cox, David},
+  title     = {Triton: An Intermediate Language and Compiler for Tiled Neural Network Computations},
+  booktitle = {Proceedings of the 3rd ACM SIGPLAN International Workshop on Machine Learning and Programming Languages (MAPL)},
+  pages     = {10--19},
+  year      = {2019},
+  doi       = {10.1145/3315508.3329973}
+}
+
+@inproceedings{mlir21,
+  author    = {Lattner, Chris and Amini, Mehdi and Bondhugula, Uday and Cohen, Albert and Davis, Andy and Pienaar, Jacques and Riddle, River and Shpeisman, Tatiana and Vasilache, Nicolas and Zinenko, Oleksandr},
+  title     = {{MLIR}: Scaling Compiler Infrastructure for Domain Specific Computation},
+  booktitle = {Proceedings of the IEEE/ACM International Symposium on Code Generation and Optimization (CGO)},
+  pages     = {2--14},
+  year      = {2021}
+}
+
+%% ---------------- XLA / OpenXLA 官方文档 ----------------
+
+@misc{xla_arch,
+  author       = {{OpenXLA Project}},
+  title        = {{XLA} Architecture},
+  howpublished = {\url{https://github.com/openxla/xla/blob/main/docs/architecture.md}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{xla_thunks,
+  author       = {{OpenXLA Project}},
+  title        = {From {HLO} to Thunks},
+  howpublished = {\url{https://github.com/openxla/xla/blob/main/docs/hlo_to_thunks.md}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{xla_backend,
+  author       = {{OpenXLA Project}},
+  title        = {Developing a New Backend for {XLA}},
+  howpublished = {\url{https://github.com/openxla/xla/blob/main/docs/developing_new_backend.md}},
+  note         = {Accessed 2026-11-23}
+}
+
+%% ---------------- Triton ----------------
+
+@misc{triton_dialects,
+  author       = {{Triton Project}},
+  title        = {Triton {MLIR} Dialects and Ops},
+  howpublished = {\url{https://triton-lang.org/main/dialects/dialects.html}},
+  note         = {Accessed 2026-11-23}
+}
+
+%% ---------------- StableHLO（§5） ----------------
+
+@misc{stablehlo_repo,
+  author       = {{OpenXLA Project}},
+  title        = {{StableHLO}: Backward Compatible {ML} Compute Opset Inspired by {HLO}/{MHLO}},
+  howpublished = {\url{https://github.com/openxla/stablehlo}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{stablehlo_compat,
+  author       = {{OpenXLA Project}},
+  title        = {{StableHLO} Compatibility},
+  howpublished = {\url{https://github.com/openxla/stablehlo/blob/main/docs/compatibility.md}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{stablehlo_spec,
+  author       = {{OpenXLA Project}},
+  title        = {{StableHLO} Specification},
+  howpublished = {\url{https://github.com/openxla/stablehlo/blob/main/docs/spec.md}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{stablehlo_v1,
+  author       = {{OpenXLA Project}},
+  title        = {{StableHLO} v1.0 Release},
+  howpublished = {\url{https://github.com/openxla/stablehlo/releases/tag/v1.0.0}},
+  year         = {2024},
+  note         = {Released 2024-05-14; accessed 2026-11-23}
+}
+
+@misc{mlirhlo_repo,
+  author       = {{OpenXLA Project}},
+  title        = {{MLIR-HLO}: A Standalone {HLO} {MLIR}-based Compiler (deprecated)},
+  howpublished = {\url{https://github.com/tensorflow/mlir-hlo}},
+  note         = {Deprecation notice in README; accessed 2026-11-23}
+}
+
+@misc{stablehlo_rfc_compat,
+  author       = {{OpenXLA Project}},
+  title        = {{StableHLO} Compatibility {RFC}},
+  howpublished = {\url{https://github.com/openxla/stablehlo/blob/main/rfcs/20220912-compatibility.md}},
+  year         = {2022}
+}
+
+@misc{stablehlo_rfc_v1_compat,
+  author       = {{OpenXLA Project}},
+  title        = {{StableHLO} v1.0 Compatibility {RFC}},
+  howpublished = {\url{https://github.com/openxla/stablehlo/blob/main/rfcs/20230623-compatibility.md}},
+  year         = {2023}
+}
+
+@misc{stablehlo_rfc_fwd,
+  author       = {{OpenXLA Project}},
+  title        = {Forward Compatibility Testing {RFC}},
+  howpublished = {\url{https://github.com/openxla/stablehlo/blob/main/rfcs/20230517-forward-compatibility-testing.md}},
+  year         = {2023}
+}
+
+%% ---------------- MLIR 官方文档（§3 的四个机制） ----------------
+
+@misc{mlir_interfaces,
+  author       = {{LLVM Project}},
+  title        = {{MLIR} Interfaces},
+  howpublished = {\url{https://mlir.llvm.org/docs/Interfaces/}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{mlir_conversion,
+  author       = {{LLVM Project}},
+  title        = {{MLIR} Dialect Conversion},
+  howpublished = {\url{https://mlir.llvm.org/docs/DialectConversion/}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{mlir_ods,
+  author       = {{LLVM Project}},
+  title        = {Operation Definition Specification ({ODS})},
+  howpublished = {\url{https://mlir.llvm.org/docs/DefiningDialects/Operations/}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{mlir_bufferization,
+  author       = {{LLVM Project}},
+  title        = {{MLIR} Bufferization},
+  howpublished = {\url{https://mlir.llvm.org/docs/Bufferization/}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{mlir_shape,
+  author       = {{LLVM Project}},
+  title        = {{MLIR} Shape Inference},
+  howpublished = {\url{https://mlir.llvm.org/docs/ShapeInference/}},
+  note         = {Accessed 2026-11-23}
+}
+
+@misc{mlir_users,
+  author       = {{LLVM Project}},
+  title        = {Users of {MLIR}},
+  howpublished = {\url{https://mlir.llvm.org/users/}},
+  note         = {Accessed 2026-11-23}
+}

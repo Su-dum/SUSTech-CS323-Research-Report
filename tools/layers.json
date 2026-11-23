@@ -144,7 +144,9 @@
       "f64": "WAT 片段，非 MLIR",
       "local": "WAT 片段，非 MLIR",
       "global": "WAT 片段，非 MLIR",
-      "iree": "非上游方言，本语料中不应出现"
+      "iree": "非上游方言，本语料中不应出现",
+      "common_folders.mlir": "test/Dialect/ 直下的单文件测试，不是方言目录；切分后得到的是文件名",
+      "traits.mlir": "test/Dialect/ 直下的单文件测试，不是方言目录；切分后得到的是文件名"
     },
     "dialects": [
       "test",
@@ -181,11 +183,13 @@
       "f64",
       "local",
       "global",
-      "iree"
+      "iree",
+      "common_folders.mlir",
+      "traits.mlir"
     ]
   },
   "aliases": {
-    "_comment": "Conversion 目录名（CamelCase）到 dialect 命名空间（小写）的映射，用于把 XToY 目录解析成层间边。",
+    "_comment": "Conversion 目录名与 test/Dialect/<Name> 目录名到 dialect 命名空间的映射。LLVMIR / SparseTensor / MLProgram / X86 这类名字驼峰切分得不到正确命名空间，必须显式映射，否则归属会静默失败（audit_attribution.py 可查）。",
     "ControlFlow": "cf",
     "Standard": "cf",
     "MemRef": "memref",
@@ -232,7 +236,15 @@
     "Async": "async",
     "Shard": "shard",
     "DLTI": "dlti",
-    "IRDL": "irdl"
+    "IRDL": "irdl",
+    "LLVMIR": "llvm",
+    "SparseTensor": "sparse_tensor",
+    "X86": "x86",
+    "MLProgram": "ml_program",
+    "AMX": "x86",
+    "LLVMSPV": "llvm",
+    "Libm": "func",
+    "ROCDLLibraryCalls": "rocdl"
   },
   "infra": {
     "_comment": "编译器基础设施方言：描述编译过程本身（调度、匹配、方言定义、求解），不属于被编译程序的抽象层。单独统计并报告，不参与层映射。",
@@ -246,7 +258,7 @@
     ]
   },
   "conversion_overrides": {
-    "_comment": "Conversion 目录名无法用简单的 XToY 拆分时的人工覆盖。src/dst 用 dialect 命名空间；src 为 * 表示源方言不定（不计入层间边）。",
+    "_comment": "Conversion 目录名无法用简单 XToY 拆分时的人工覆盖。src/dst 用 dialect 命名空间；任一端为 * 表示该端不定（不计入层间边，只在报告里列出）。",
     "TosaToSPIRVTosa": {
       "src": "tosa",
       "dst": "spirv",
@@ -286,6 +298,11 @@
       "src": "*",
       "dst": "*",
       "note": "清理 unrealized_conversion_cast，不属于抽象层之间的转换"
+    },
+    "ArithAndMathToAPFloat": {
+      "src": "*",
+      "dst": "*",
+      "note": "多源（arith + math）降到 LLVM APFloat 库调用；源与目标都不定，不计入层间边"
     }
   }
 }

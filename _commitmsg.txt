@@ -1,0 +1,60 @@
+Fix two data-pipeline defects found by external review; add paper skeleton
+
+外部 review 逐行审查了脚本并重跑验证，指出两个**真实的实现缺陷**。本次修复
+并重新生成全部产物，同时同步所有文档与论文中的数字。
+
+== 缺陷 1：Dialect 目录归属静默丢失 235 个文件（严重） ==
+collect_corpus 的 camel_to_ns() 对 test/Dialect/<Name> 做驼峰切分，得到错误命名
+空间，analyze.py 又不告警，导致整批文件从"投入分布"里消失：
+  LLVMIR(86)        -> "llvmir"        应为 llvm
+  SparseTensor(122) -> "sparsetensor"  应为 sparse_tensor
+  X86(19)           -> "x"             应为 x86
+  MLProgram(6)      -> "mlprogram"     应为 ml_program
+另有 2 个 test/Dialect/ 直下的单文件被当成方言目录。
+
+修复：在 layers.json 的 aliases 里补 8 个别名，2 个单文件归入 noise。
+后果（已同步进 docs/04、08 与论文表 2）：
+  各层投入 259/235/232/222/56/73 -> 364/354/235/222/62/73 + 基础设施 80
+  导入层占比 5.2% -> 4.5%；已归属文件 1,077 -> 1,390
+  **发现 3 的叙事随之重写**：不再是"四个中后段层几乎均匀"，而是明显两级
+  （目标 26.2%、张量 25.5% | 并行 16.9%、存储 16.0% | 导入 4.5%）。
+  主论点（栈顶投入显著最低）反而更强：4.5% vs 16–26%。
+
+== 缺陷 2：Conversion 目录名被贪婪切分出 7 条伪边 ==
+GPUToLLVMSPV / ArithAndMathToAPFloat / ComplexToLibm / MathToLibm /
+ComplexToROCDLLibraryCalls / TosaToMLProgram / VectorToAMX 被解析成
+llvmspv / apfloat / libm / rocdllibrarycalls / amx / mlprogram 等假方言。
+
+修复：再补 8 个别名（LLVMSPV->llvm、Libm->func、ROCDLLibraryCalls->rocdl、
+AMX->x86 等）+ 1 条 conversion_overrides（ArithAndMathToAPFloat 两端不定）。
+注意：修正方式是**重新归属**而非删除，故 |E| 78 -> **76**（review 估计的 71
+偏保守，多数伪边对应真实转换，只是名字解析错了）。
+连锁：M 由 10 -> **11**（x86 进入目标集），工程级 N* 17.6 -> **15.5**，
+架构级 N* 4.8 -> **4.6**，最深层占比 79.0% -> **79.2%**（236/298）。
+
+== 顺带修掉的其他 review 条目 ==
+- analyze.py：新增"未归属 Dialect 文件"告警（不再静默）；--n-backends 缺省时
+  自动采用实测 M（README 曾传 8 而产物用 10，导致不可复现）；facts.md 不再写死
+  "target" 字样（替代划分下会输出无意义句子）；从 corpus 同级目录取 meta.json
+  并复制进输出目录（out_alt 之前缺 meta，facts 里"计入算子 0"）；目标端点表只
+  统计两端确定的边，避免同一方言出现两套文件数（spirv 57 / 72 并存）。
+- 新增 tools/audit_attribution.py：专查这类"归属失败"，输出丢失目录与伪边清单。
+- 新增 tools/make_layers_alt.py：从主配置生成替代划分，避免 aliases/noise 漂移
+  （旧 layers_alt.json 已过期，非零层对 18 -> 20）。
+- docs/05：XLA "Retargeting..." 引文出处更正为 developing_new_backend.md（原标
+  architecture.md 有误）；补 mlir21 的 DOI 10.1109/CGO51591.2021.9370308。
+- docs/07：issue #1632 状态经 GitHub API 确认为 open，"尚未上游化"可以放心写。
+- docs/01：页数预算 16.3 -> 14.3（原加法有误）。
+- docs/04：新增「发现 4b |E| 的社区摊销」——review 建议的最有价值的一点，用来
+  解开"模型说分层更贵"与"MLIR 确实被广泛采用"之间的张力。
+- docs/08：L2 家族表补上 72 个中间层目标；GPU 厂商合计 118 -> 119；MOLIR 拼写。
+- README：移除对已删除 ai-log.md 的引用；复现命令改为自动取 M，稳健性运行显式
+  传 --n-backends 11。
+- tools/check_paper.py：STALE 黑名单更新为"过时数字"（78 / 79.0% / 17.6 / 4.8 /
+  M=10 / 1,077 等），使其真能拦住数字漂移。
+
+== 论文（paper/，首次入库）==
+acmsmall 单栏 + nonacm + XeLaTeX（含中文，xeCJK + Fandol）。骨架已本地编译通过
+（Tectonic 0.17 / XeTeX，6 页）：表 1 维度对比、表 2 投入分布、表 3 StableHLO 契约
+设施、表 4 局限，图 1-4 全部就位，各节正文以 TODO 注释给出结构。
+24 条参考文献（18 条经 Crossref/USENIX 核对）。正文散文尚未写。

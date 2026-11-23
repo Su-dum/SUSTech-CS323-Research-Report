@@ -107,7 +107,7 @@ Out of scope 三条（prettyprinted IR、未规格特性、bug compatibility）�
 | "Future work: 把兼容性测试套贡献回 MLIR 上游（#1632）" | `docs/compatibility.md` `## Future work` | ✅ |
 | `WEEK_4` / `WEEK_12` | `docs/compatibility.md` `## Versions` 与 `## Guarantees` | ✅ |
 
-> 一处未核：issue #1632 的具体内容与状态我没打开（只引用了 `compatibility.md` 对它的描述）。若正文要写"该测试套尚未上游化"，请先确认该 issue 仍然 open。
+> 已核实（外部 review 用 GitHub API 查过）：**issue #1632 仍为 open**，因此"该测试套尚未上游化"可以放心写。
 
 ---
 

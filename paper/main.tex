@@ -1,0 +1,140 @@
+%% ============================================================
+%%  MLIR 的多级抽象设计及其在 AI 编译器生态中的角色
+%%  CS323 Compilers —— Research Report (Fall 2026)
+%%
+%%  编译引擎：XeLaTeX（含中文，pdfLaTeX 不可用）
+%%  编译顺序：xelatex -> bibtex -> xelatex -> xelatex
+%%  格式：acmsmall（ACM 期刊小号单栏；不是 sigconf 双栏会议版）
+%% ============================================================
+%% nonacm=true 是 acmart 的官方开关，用于"非 ACM 出版"场合：会去掉首页的版权块、
+%% 价格行与虚构 DOI（否则会出现 "2026. 0164-0925/... $15.00" 与 doi.org/10.1145/nnnn...）。
+%% 注意 acmart 的 toppmatter 只有 printccs / printacmref / printfolios 三个键，
+%% 没有 printcopyright，所以不能靠 \settopmatter 关版权块。
+\documentclass[acmsmall, screen=true, review=false, nonacm=true]{acmart}
+
+%% ---- 期刊信息 ----
+%% acmart 的 \acmJournal 是 xkeyval 的 choice key：只接受其内部注册的代码。
+%% 写成 CS323 之类的自定义名称会直接报 "Class acmart Error: Incorrect journal"。
+%% 本文按主题选用 TOPLAS（ACM Transactions on Programming Languages and Systems）。
+%% 其它常用合法代码：TACO / TOMS / CSUR / TOPC。
+\acmJournal{TOPLAS}
+\acmYear{2026}
+\acmVolume{1}
+\acmNumber{1}
+\acmArticle{1}
+\acmMonth{11}
+\setcopyright{none}
+
+%% ---- 中文支持 ----
+%% 本文含中文，必须用 XeLaTeX 或 LuaLaTeX 编译。pdfLaTeX 会报
+%%   "Unicode character 的 (U+7684) not set up for use with LaTeX"
+%% Overleaf：Menu -> Settings -> Compiler -> XeLaTeX
+\usepackage{iftex}
+\ifPDFTeX
+  \PackageError{main}{This report contains Chinese text.^^J%
+    Switch the compiler to XeLaTeX (or LuaLaTeX) and recompile.}%
+    {Overleaf: Menu -> Settings -> Compiler -> XeLaTeX}
+\fi
+\ifXeTeX
+  \usepackage{xeCJK}
+  \setCJKmainfont[ItalicFont=FandolKai-Regular.otf,BoldFont=FandolHei-Regular.otf]{FandolSong-Regular.otf}
+  \setCJKsansfont{FandolHei-Regular.otf}
+  \setCJKmonofont{FandolFang-Regular.otf}
+\fi
+\ifLuaTeX
+  \usepackage{luatexja-fontspec}
+  \setmainjfont{FandolSong-Regular.otf}
+  \setsansjfont{FandolHei-Regular.otf}
+  \setmonojfont{FandolFang-Regular.otf}
+\fi
+
+%% ---- 表 1 需要；图用 graphicx（acmart 已加载） ----
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{siunitx}
+%% SVG 图：Overleaf 自带 inkscape，可启用下面这行并把 \includegraphics 换成 \includesvg
+%% \usepackage{svg}
+
+%% ---- 关闭版权块与 ACM Reference Format 占位 ----
+%% 课程报告不投 ACM，避免出现虚构 DOI/版权声明。
+%% 注意：不要用 \def\footnotetextcopyrightpermission#1{} 之类的重定义 ——
+%% acmart 是用 {…\par…} 调它的，非 \long 的 \def 会报
+%% "Paragraph ended before \footnotetextcopyrightpermission was complete"。
+%% 官方做法是 \setcopyright{none}（copyright mode = none 会同时关掉 copyright 与 permission）。
+\settopmatter{printacmref=false}
+\pagestyle{plain}
+
+\begin{document}
+
+\title{MLIR 的多级抽象设计及其在 AI 编译器生态中的角色：\\从成对适配到分层共享的复用成本分析}
+
+%% ---- 作者信息（按需填写学号） ----
+\author{Su-dum}
+\affiliation{%
+  \institution{Southern University of Science and Technology}
+  \department{Department of Computer Science and Engineering}
+  \city{Shenzhen}
+  \country{China}}
+\email{12410337@mail.sustech.edu.cn}
+
+\author{（组员姓名，待填）}
+\affiliation{%
+  \institution{Southern University of Science and Technology}
+  \city{Shenzhen}
+  \country{China}}
+
+\renewcommand{\shortauthors}{Su-dum et al.}
+
+%% ============================================================
+\begin{abstract}
+%% TODO(§ 摘要)：定稿时写成三句——问题与通行叙事（N×M）、本文做法（重构命题 + 语料实证 + 成本模型）、
+%% 结论的限定形式（"在……条件下成立"）。以下是占位草稿，不要原样提交。
+一个编译器要同时面对 $N$ 个前端框架与 $M$ 种硬件，逐对适配的成本是乘法的。
+本文把"MLIR 解决了 $N\times M$ 组合爆炸"这一通行叙事，重构为一个可检验的命题：
+MLIR 把适配成本从 $N\cdot M$ 重写为 $|E|+N+M$，但收益取决于共享层是否被多方采纳。
+基于 \texttt{llvm-project} 的 3,329 个 MLIR 测试文件（181,326 个算子），
+本文测得 $|E|=76$ 条方言间转换、$371$ 个转换文件中有 $298$ 个进入层间矩阵，并发现收敛发生在少数端点上而非层级上。
+成本模型显示，工程层面的门槛约在 9 到 26 个前端之间（随采纳率），而架构层面的门槛只有约 5 个。
+\end{abstract}
+
+%% ---- CCS Concepts：若需完整版，请从 dl.acm.org 的 CCS 工具生成 CCSXML 后粘贴 ----
+%% （不提供 CCSXML 也能编译；下面只给 \ccsdesc 会正常排出版块）
+\begin{CCSXML}
+<ccs2012>
+ <concept>
+  <concept_id>10011007.10011006.10011041</concept_id>
+  <concept_desc>Software and its engineering~Compilers</concept_desc>
+  <concept_significance>500</concept_significance>
+ </concept>
+ <concept>
+  <concept_id>10011007.10011006.10011008</concept_id>
+  <concept_desc>Software and its engineering~Intermediate languages</concept_desc>
+  <concept_significance>300</concept_significance>
+ </concept>
+</ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Software and its engineering~Compilers}
+\ccsdesc[300]{Software and its engineering~Intermediate languages}
+
+\keywords{MLIR, multi-level IR, dialect, progressive lowering, AI compiler, reuse cost}
+
+\maketitle
+
+%% ============================================================
+\input{sections/01-intro}
+\input{sections/02-background}
+\input{sections/03-mechanisms}
+\input{sections/04-evidence}
+\input{sections/05-contract}
+\input{sections/06-limitations}
+\input{sections/07-conclusion}
+
+%% ---- 可选：AI 使用披露（课程已取消强制要求；保留与否自定） ----
+%% \section*{Use of AI Tools}
+%% ...
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}

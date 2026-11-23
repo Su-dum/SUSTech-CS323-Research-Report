@@ -9,7 +9,7 @@
 |---|---|
 | 选题与命题 | ✅ 定稿为「成本重分配 + 条件性收益」 |
 | 语料获取 | ✅ `llvm-project` @ `ba736172`，稀疏克隆只取 `mlir/` |
-| 数据采集与分析 | ✅ 3,329 个测试文件 / 181,326 个算子 / 78 条方言转换边 |
+| 数据采集与分析 | ✅ 3,329 个测试文件 / 181,326 个算子 / 76 条方言转换边 |
 | 四张图 | ✅ `out/fig1..fig4.svg`（PNG 为预览） |
 | 结果解读 | ✅ [docs/04-results-v1.md](docs/04-results-v1.md)，含稳健性检验 |
 | §2 对比表 | ✅ [docs/05-section2-comparison.md](docs/05-section2-comparison.md)，已核到一手文献 |
@@ -32,7 +32,6 @@
 | [docs/01-outline-v1.md](docs/01-outline-v1.md) | 七节大纲：每节必须回答的问题、页数预算、图表位置 |
 | [docs/02-experiment-design-v1.md](docs/02-experiment-design-v1.md) | 实验设计：假设、证伪判据、指标口径、成本模型推导 |
 | [docs/03-data-acquisition.md](docs/03-data-acquisition.md) | 语料获取与校验（已完成，留作复现记录） |
-| [ai-log.md](ai-log.md) | AI 使用日志（课程现已无强制要求，保留作为学术惯例记录） |
 | `tools/collect_corpus.py` | 采集：扫 `mlir/test/**/*.mlir`，解析 `Conversion/XToY` 为层间边 |
 | `tools/analyze.py` | 聚合 + 出图（SVG，零依赖）+ 生成 `facts.md` |
 | `tools/diagnose_namespaces.py` | 排除某个方言前，先用它看样例行（口径透明度） |
@@ -62,13 +61,14 @@ git -C D:\llvm-project sparse-checkout set mlir
 python tools\collect_corpus.py --mlir-root D:\llvm-project\mlir --outdir out
 
 # 3) 分析（主划分）
-python tools\analyze.py --corpus out\corpus.csv --outdir out --n-frameworks 8 --n-backends 8 --adoption 0.6 --preview-png
+python tools\analyze.py --corpus out\corpus.csv --outdir out --n-frameworks 8 --adoption 0.6 --preview-png
 
 # 4) 稳健性检验（替代划分）
-python tools\analyze.py --corpus out\corpus.csv --outdir out_alt --config tools\layers_alt.json --n-frameworks 8 --n-backends 8 --adoption 0.6
+python tools\make_layers_alt.py
+python tools\analyze.py --corpus out\corpus.csv --outdir out_alt --config tools\layers_alt.json --n-frameworks 8 --n-backends 11 --adoption 0.6
 ```
 
-参数说明：`M=10` 由数据实测（`target` 层内作为转换目标的方言数：llvm/spirv/rocdl/xevm/nvvm/amdgpu/xegpu/arm_sme/nvgpu/vcix）；`N=8` 是生态假设，需在正文说明来源；`p=0.6` 是敏感性分析的基线，不是估计值。
+参数说明：`M` 省略时**自动取实测值**（当前为 11 = `target` 层内作为转换目标的方言数，含 llvm/spirv/rocdl/xevm/nvvm/amdgpu/xegpu/arm_sme/nvgpu/vcix/x86）；`N=8` 是生态假设，需在正文说明来源；`p=0.6` 是敏感性分析的基线，不是估计值。稳健性运行需显式传 `--n-backends 11`，以与主划分可比。
 
 ## 三条写作纪律
 

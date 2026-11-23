@@ -3,9 +3,9 @@
     "n_files": 3329
   },
   "structure": {
-    "n_distinct_dialect_pairs": 78,
+    "n_distinct_dialect_pairs": 76,
     "layer_matrix": {
-      "frontend->frontend": 0,
+      "frontend->frontend": 1,
       "frontend->tensor": 9,
       "frontend->parallel": 2,
       "frontend->memory_vector": 0,
@@ -16,19 +16,19 @@
       "tensor->parallel": 3,
       "tensor->memory_vector": 0,
       "tensor->generic_exit": 5,
-      "tensor->vendor": 0,
+      "tensor->vendor": 1,
       "parallel->frontend": 0,
       "parallel->tensor": 0,
       "parallel->parallel": 25,
       "parallel->memory_vector": 5,
-      "parallel->generic_exit": 32,
+      "parallel->generic_exit": 35,
       "parallel->vendor": 25,
       "memory_vector->frontend": 0,
       "memory_vector->tensor": 0,
       "memory_vector->parallel": 6,
       "memory_vector->memory_vector": 8,
       "memory_vector->generic_exit": 31,
-      "memory_vector->vendor": 13,
+      "memory_vector->vendor": 15,
       "generic_exit->frontend": 0,
       "generic_exit->tensor": 0,
       "generic_exit->parallel": 0,
@@ -44,18 +44,19 @@
     },
     "layer_out_degree": {
       "vendor": 91,
-      "parallel": 87,
-      "memory_vector": 58,
+      "parallel": 90,
+      "memory_vector": 60,
       "generic_exit": 25,
-      "frontend": 21,
-      "tensor": 9
+      "frontend": 22,
+      "tensor": 10
     },
     "layer_in_degree": {
-      "generic_exit": 124,
-      "vendor": 106,
+      "generic_exit": 127,
+      "vendor": 109,
       "parallel": 38,
       "memory_vector": 13,
-      "tensor": 10
+      "tensor": 10,
+      "frontend": 1
     },
     "top_dialect_edges": [
       {
@@ -137,7 +138,7 @@
     "deepest_layers": [
       "vendor"
     ],
-    "share_edges_landing_in_deepest_layers": 0.3642611683848797
+    "share_edges_landing_in_deepest_layers": 0.36577181208053694
   },
   "cooccurrence": {
     "dialect_document_frequency": {
@@ -176,31 +177,43 @@
   },
   "investment": {
     "files_per_layer": {
+      "tensor": 354,
       "parallel": 235,
-      "tensor": 232,
       "memory_vector": 222,
-      "vendor": 201,
-      "generic_exit": 58,
-      "frontend": 56
+      "vendor": 220,
+      "generic_exit": 144,
+      "frontend": 62
     },
     "crosslayer_files": 73,
+    "infra_files": {
+      "transform": 45,
+      "irdl": 16,
+      "smt": 8,
+      "dlti": 5,
+      "pdl": 4,
+      "pdl_interp": 2
+    },
+    "unmapped_files": {},
+    "attributed_total": 1390,
     "total": 3329
   },
   "cost_model": {
     "formula_pairwise": "N*M",
     "formula_layered": "|E| + N + M + (1-p)*N*M",
-    "E_measured": 78,
+    "E_measured": 76,
     "N": 8,
-    "M": 10,
+    "M": 11,
     "p": 0.6,
+    "M_measured": 0,
+    "M_source": "显式指定 M=11；实测值为 0（与实测不一致，请说明理由）",
     "crossover_N_by_p": {
-      "p=0.4": 29.33,
-      "p=0.5": 22.0,
-      "p=0.6": 17.6,
-      "p=0.8": 12.57,
-      "p=1.0": 9.78
+      "p=0.4": 25.59,
+      "p=0.5": 19.33,
+      "p=0.6": 15.54,
+      "p=0.8": 11.15,
+      "p=1.0": 8.7
     },
-    "note": "E 为本语料测得的 (dialect, dialect) 转换边数，作为'每条层间边界实现一次'的成本单位。N、M、p 必须由作者核实来源后填入并在报告中说明取值依据。"
+    "note": "E 为本语料测得的 (dialect, dialect) 转换边数，作为'每条层间边界实现一次'的成本单位。M 缺省时自动取实测值；N 与 p 必须由作者核实来源后填入并说明取值依据。"
   },
   "interpretation": {
     "_instructions": "以下字段必须由报告作者本人填写；null 表示分析尚未完成。",
